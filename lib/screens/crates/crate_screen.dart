@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:crate_tracking/screens/bottom_nav_bar.dart';
 import 'package:crate_tracking/screens/crates/loading_tab.dart';
+import 'package:crate_tracking/screens/crates/unloading_tab.dart';
 import 'package:crate_tracking/screens/crates/receiving_tab.dart';
 
 class CrateScreen extends StatefulWidget {
@@ -17,7 +18,7 @@ class _CrateScreenState extends State<CrateScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this);
+    _tabController = TabController(length: 3, vsync: this);
   }
 
   @override
@@ -34,12 +35,16 @@ class _CrateScreenState extends State<CrateScreen>
         backgroundColor: const Color.fromARGB(255, 249, 139, 71),
         bottom: TabBar(
           controller: _tabController,
-          tabs: const [Tab(text: "Loading"), Tab(text: "Receiving")],
+          tabs: const [
+            Tab(text: "Loading"),
+            Tab(text: "Unloading"),
+            Tab(text: "Receiving"),
+          ],
         ),
       ),
       body: TabBarView(
         controller: _tabController,
-        children: const [LoadingTab(), ReceivingTab()],
+        children: const [LoadingTab(), UnloadingTab(), ReceivingTab()],
       ),
       bottomNavigationBar: const BottomNavBar(currentIndex: 1),
     );

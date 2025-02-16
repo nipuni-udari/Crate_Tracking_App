@@ -19,6 +19,7 @@ class _LoadingTabState extends State<LoadingTab> {
   String? selectedLorry;
   List<String> lorryNumbers = [];
   String serverResponse = "";
+  int totalScannedCrates = 0; // Add this variable
 
   Future<List<String>> fetchVehicles(
     String subLocationId,
@@ -66,9 +67,11 @@ class _LoadingTabState extends State<LoadingTab> {
   void _doneScanning() {
     setState(() {
       isScanning = false;
+      totalScannedCrates = scannedCrates.length; // Store the count
+      scannedCrates.clear(); // Clear the list for the next scan
     });
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text("Total crates scanned: ${scannedCrates.length}")),
+      SnackBar(content: Text("Total crates scanned: $totalScannedCrates")),
     );
   }
 
@@ -94,6 +97,37 @@ class _LoadingTabState extends State<LoadingTab> {
         serverResponse = "Error: ${e.toString()}";
       });
     }
+  }
+
+  Widget _buildTotalScannedCrates() {
+    return Card(
+      elevation: 5,
+      margin: const EdgeInsets.all(16),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      child: Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              const Color.fromARGB(255, 249, 139, 71),
+              const Color.fromARGB(255, 255, 183, 77),
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Text(
+          "Loaded Crates = $totalScannedCrates",
+          style: const TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
+          textAlign: TextAlign.center,
+        ),
+      ),
+    );
   }
 
   @override
@@ -124,6 +158,9 @@ class _LoadingTabState extends State<LoadingTab> {
                   _buildLocationDetails(userProvider),
                   const SizedBox(height: 20),
                   _buildStartScanButton(),
+                  if (totalScannedCrates >
+                      0) // Show the count if crates were scanned
+                    _buildTotalScannedCrates(),
                 ],
               ),
     );

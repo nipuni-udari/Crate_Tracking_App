@@ -81,17 +81,27 @@ class _ReceivingTabState extends State<ReceivingTab> {
         body: {'serial': serialNumber, 'vehicle_no': selectedLorry!},
       );
 
-      final responseData = json.decode(response.body);
-      setState(() {
-        if (response.statusCode == 200 && responseData["status"] == "success") {
-          serverResponse = "Crate $serialNumber saved successfully!";
-        } else {
-          serverResponse = "Failed to save crate: ${responseData["message"]}";
-        }
-      });
+      // Check if response is JSON
+      try {
+        final responseData = json.decode(response.body);
+        setState(() {
+          if (response.statusCode == 200 &&
+              responseData["status"] == "success") {
+            serverResponse = "Crate $serialNumber saved successfully!";
+          } else {
+            serverResponse =
+                "Failed to save crate: ${responseData["message"] ?? 'Unknown error'}";
+          }
+        });
+      } catch (e) {
+        // Handle non-JSON responses
+        setState(() {
+          serverResponse = "Invalid server response: ${response.body}";
+        });
+      }
     } catch (e) {
       setState(() {
-        serverResponse = "Error: ${e.toString()}";
+        serverResponse = "Network error: ${e.toString()}";
       });
     }
   }
