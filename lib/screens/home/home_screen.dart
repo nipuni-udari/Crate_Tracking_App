@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:crate_tracking/screens/bottom_nav_bar.dart';
-import 'package:crate_tracking/screens/home/widgets/item_category.dart';
+import 'package:crate_tracking/screens/home/widgets/functions.dart';
 import 'package:crate_tracking/screens/home/widgets/special_offer_banner.dart';
 import 'package:crate_tracking/user_provider.dart';
 import 'package:flutter/material.dart';
@@ -99,14 +99,37 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         automaticallyImplyLeading: false,
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: const [
-            SpecialOfferBanner(),
-            //FoodCategory()
-          ],
-        ),
+      body: Stack(
+        children: [
+          // Background Image with Repeat Pattern
+          Container(
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                opacity:
+                    0.1, // Adjust transparency level (0.0 - fully transparent, 1.0 - fully visible)
+                image: AssetImage("assets/images/background_pattern.jpg"),
+                repeat: ImageRepeat.repeat, // Makes the background repeat
+              ),
+            ),
+          ),
+
+          // Content
+          SingleChildScrollView(
+            child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: const [
+                  SpecialOfferBanner(),
+                  SizedBox(height: 20),
+                  FunctionsWidget(),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
+
       bottomNavigationBar: const BottomNavBar(currentIndex: 0),
     );
   }

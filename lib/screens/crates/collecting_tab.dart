@@ -6,14 +6,14 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:crate_tracking/user_provider.dart';
 
-class LoadingTab extends StatefulWidget {
-  const LoadingTab({Key? key}) : super(key: key);
+class CollectingTab extends StatefulWidget {
+  const CollectingTab({Key? key}) : super(key: key);
 
   @override
-  _LoadingTabState createState() => _LoadingTabState();
+  _CollectingTabState createState() => _CollectingTabState();
 }
 
-class _LoadingTabState extends State<LoadingTab> {
+class _CollectingTabState extends State<CollectingTab> {
   List<String> scannedCrates = [];
   bool isScanning = false;
   String? selectedLorry;
@@ -77,7 +77,7 @@ class _LoadingTabState extends State<LoadingTab> {
     try {
       final response = await http.post(
         Uri.parse(
-          'https://demo.secretary.lk/cargills_app/backend/save_load_total_crates.php',
+          'https://demo.secretary.lk/cargills_app/backend/save_collect_total_crates.php',
         ),
         body: {
           'vehicle_no': selectedLorry!,
@@ -124,55 +124,34 @@ class _LoadingTabState extends State<LoadingTab> {
     try {
       final response = await http.post(
         Uri.parse(
-          'https://demo.secretary.lk/cargills_app/backend/loading_crate_log.php',
+          'https://demo.secretary.lk/cargills_app/backend/collecting_crate_log.php',
         ),
         body: {'serial': serialNumber, 'vehicle_no': selectedLorry!},
       );
 
-      final responseData = json.decode(response.body);
-      setState(() {
-        if (response.statusCode == 200 && responseData["status"] == "success") {
-          serverResponse = "Crate $serialNumber saved successfully!";
-        } else {
-          serverResponse = "Failed to save crate: ${responseData["message"]}";
-        }
-      });
+      // Check if response is JSON
+      try {
+        final responseData = json.decode(response.body);
+        setState(() {
+          if (response.statusCode == 200 &&
+              responseData["status"] == "success") {
+            serverResponse = "Crate $serialNumber saved successfully!";
+          } else {
+            serverResponse =
+                "Failed to save crate: ${responseData["message"] ?? 'Unknown error'}";
+          }
+        });
+      } catch (e) {
+        // Handle non-JSON responses
+        setState(() {
+          serverResponse = "Invalid server response: ${response.body}";
+        });
+      }
     } catch (e) {
       setState(() {
-        serverResponse = "Error: ${e.toString()}";
+        serverResponse = "Network error: ${e.toString()}";
       });
     }
-  }
-
-  Widget _buildTotalScannedCrates() {
-    return Card(
-      elevation: 5,
-      margin: const EdgeInsets.all(16),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      child: Container(
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [
-              const Color.fromARGB(255, 249, 139, 71),
-              const Color.fromARGB(255, 255, 183, 77),
-            ],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-          borderRadius: BorderRadius.circular(10),
-        ),
-        child: Text(
-          "Loaded Crates = $totalScannedCrates",
-          style: const TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
-          ),
-          textAlign: TextAlign.center,
-        ),
-      ),
-    );
   }
 
   @override
@@ -203,9 +182,6 @@ class _LoadingTabState extends State<LoadingTab> {
                   _buildLocationDetails(userProvider),
                   const SizedBox(height: 20),
                   _buildStartScanButton(),
-                  if (totalScannedCrates >
-                      0) // Show the count if crates were scanned
-                    _buildTotalScannedCrates(),
                 ],
               ),
     );

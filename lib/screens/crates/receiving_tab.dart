@@ -19,6 +19,7 @@ class _ReceivingTabState extends State<ReceivingTab> {
   String? selectedLorry;
   List<String> lorryNumbers = [];
   String serverResponse = "";
+  int totalScannedCrates = 0; // Add this variable
 
   Future<List<String>> fetchVehicles(
     String subLocationId,
@@ -63,12 +64,59 @@ class _ReceivingTabState extends State<ReceivingTab> {
     }
   }
 
+  Future<void> _sendTotalCratesToDatabase() async {
+    if (selectedLorry == null || totalScannedCrates == 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Please select a lorry and scan crates first"),
+        ),
+      );
+      return;
+    }
+
+    try {
+      final response = await http.post(
+        Uri.parse(
+          'https://demo.secretary.lk/cargills_app/backend/save_receive_total_crates.php',
+        ),
+        body: {
+          'vehicle_no': selectedLorry!,
+          'total_crates': totalScannedCrates.toString(),
+        },
+      );
+
+      print("Response Code: ${response.statusCode}");
+
+      final responseData = json.decode(response.body);
+
+      if (response.statusCode == 200 && responseData['status'] == 'success') {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(responseData['message'])));
+      } else {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(responseData['message'])));
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("Error: ${e.toString()}")));
+    }
+  }
+
   void _doneScanning() {
     setState(() {
       isScanning = false;
+      totalScannedCrates = scannedCrates.length; // Store the count
+      scannedCrates.clear(); // Clear the list for the next scan
     });
+
+    // Send the total crate count to the backend
+    _sendTotalCratesToDatabase();
+
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text("Total crates scanned: ${scannedCrates.length}")),
+      SnackBar(content: Text("Total crates scanned: $totalScannedCrates")),
     );
   }
 

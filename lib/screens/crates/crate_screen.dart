@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:crate_tracking/screens/bottom_nav_bar.dart';
 import 'package:crate_tracking/screens/crates/loading_tab.dart';
 import 'package:crate_tracking/screens/crates/unloading_tab.dart';
+import 'package:crate_tracking/screens/crates/collecting_tab.dart';
 import 'package:crate_tracking/screens/crates/receiving_tab.dart';
 
 class CrateScreen extends StatefulWidget {
@@ -18,7 +19,7 @@ class _CrateScreenState extends State<CrateScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
+    _tabController = TabController(length: 4, vsync: this);
   }
 
   @override
@@ -31,20 +32,32 @@ class _CrateScreenState extends State<CrateScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Crate Tracking"),
+        automaticallyImplyLeading: false, // Removes the back button
+        title: const Text(
+          "Crate Tracking",
+          style: TextStyle(color: Colors.black), // Title in white
+        ),
         backgroundColor: const Color.fromARGB(255, 249, 139, 71),
         bottom: TabBar(
           controller: _tabController,
+          labelColor: Colors.black, // Active tab text color
+          unselectedLabelColor: Colors.white, // Inactive tab text color
           tabs: const [
             Tab(text: "Loading"),
             Tab(text: "Unloading"),
+            Tab(text: "Collecting"),
             Tab(text: "Receiving"),
           ],
         ),
       ),
       body: TabBarView(
         controller: _tabController,
-        children: const [LoadingTab(), UnloadingTab(), ReceivingTab()],
+        children: const [
+          LoadingTab(),
+          UnloadingTab(),
+          CollectingTab(),
+          ReceivingTab(),
+        ],
       ),
       bottomNavigationBar: const BottomNavBar(currentIndex: 1),
     );
