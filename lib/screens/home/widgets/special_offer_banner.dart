@@ -112,7 +112,7 @@ class _SpecialOfferBannerState extends State<SpecialOfferBanner>
                         ),
                       ),
                       child: Text(
-                        'Crate Count',
+                        'Crate Count:',
                         style: TextStyle(
                           color: Color.fromARGB(255, 252, 37, 37),
                           fontSize: 14,

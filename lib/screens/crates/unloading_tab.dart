@@ -6,6 +6,7 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:crate_tracking/user_provider.dart';
 import 'package:flutter_searchable_dropdown/flutter_searchable_dropdown.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 class UnloadingTab extends StatefulWidget {
   const UnloadingTab({Key? key}) : super(key: key);
@@ -190,59 +191,165 @@ class _UnloadingTabState extends State<UnloadingTab> {
     }
   }
 
+  void _resetPage() {
+    setState(() {
+      isScanning = false;
+      scannedCrates.clear();
+      selectedLorry = null;
+      selectedCustomer = null;
+      selectedPoNumber = null;
+      serverResponse = "";
+      totalScannedCrates = 0;
+    });
+  }
+
+  Widget _buildTotalScannedCratesCard() {
+    return Positioned(
+      left: 16, // Position the card on the right side of the screen
+      top: 150, // Adjust the top position as needed
+      child: Card(
+        elevation: 5,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+        child: Container(
+          width: 300,
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                const Color.fromARGB(255, 249, 139, 71),
+                const Color.fromARGB(255, 255, 183, 77),
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            borderRadius: BorderRadius.circular(15),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Total Scanned Crates',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+              const SizedBox(height: 10),
+              Text(
+                totalScannedCrates.toString(),
+                style: const TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final userProvider = Provider.of<UserProvider>(context);
 
-    return Center(
-      child:
-          isScanning
-              ? _buildScanner()
-              : Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  _buildLorrySelection(userProvider),
-                  const SizedBox(height: 20),
-                  _buildCustomerSelection(userProvider),
-                  const SizedBox(height: 20),
-                  _buildPoSelection(userProvider),
-                  if (selectedLorry != null &&
-                      selectedCustomer != null &&
-                      selectedPoNumber != null)
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Column(
-                        children: [
-                          Text(
-                            'Selected Lorry: $selectedLorry',
-                            style: const TextStyle(
-                              fontSize: 16,
-                              color: Color.fromARGB(255, 249, 139, 71),
-                            ),
-                          ),
-                          Text(
-                            'Customer: $selectedCustomer',
-                            style: const TextStyle(
-                              fontSize: 16,
-                              color: Color.fromARGB(255, 249, 139, 71),
-                            ),
-                          ),
-                          Text(
-                            'PO Number: $selectedPoNumber',
-                            style: const TextStyle(
-                              fontSize: 16,
-                              color: Color.fromARGB(255, 249, 139, 71),
-                            ),
-                          ),
-                        ],
-                      ),
+    return Scaffold(
+      body: Stack(
+        children: [
+          // Background Image with Fade Effect
+          _buildBackgroundImage(),
+          // Location Details Card
+          _buildLocationDetailsCard(userProvider),
+          // Total Scanned Crates Card (displayed after scanning)
+          if (totalScannedCrates > 0) _buildTotalScannedCratesCard(),
+          // Selected Details Card (displayed when selections are made)
+          if (selectedLorry != null ||
+              selectedCustomer != null ||
+              selectedPoNumber != null)
+            _buildSelectedDetailsCard(),
+          Center(
+            child:
+                isScanning
+                    ? _buildScanner()
+                    : Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        _buildLorrySelection(userProvider),
+                        _buildCustomerSelection(userProvider),
+                        _buildPoSelection(userProvider),
+                        const SizedBox(height: 20),
+                        _buildStartScanButton(),
+                      ],
                     ),
-                  const SizedBox(height: 20),
-                  _buildLocationDetails(userProvider),
-                  const SizedBox(height: 20),
-                  _buildStartScanButton(),
-                ],
-              ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSelectedDetailsCard() {
+    return Positioned(
+      right: 16, // Position the card on the right side of the screen
+      top: 16, // Adjust the top position as needed
+      child: Card(
+        elevation: 5,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+        child: Container(
+          width: 300,
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                const Color.fromARGB(255, 249, 139, 71),
+                const Color.fromARGB(255, 255, 183, 77),
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            borderRadius: BorderRadius.circular(15),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (selectedLorry != null)
+                Text(
+                  'Selected Truck: $selectedLorry',
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+              if (selectedCustomer != null)
+                Padding(
+                  padding: const EdgeInsets.only(top: 8.0),
+                  child: Text(
+                    'Customer: $selectedCustomer',
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              if (selectedPoNumber != null)
+                Padding(
+                  padding: const EdgeInsets.only(top: 8.0),
+                  child: Text(
+                    'PO Number: $selectedPoNumber',
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 
@@ -254,7 +361,10 @@ class _UnloadingTabState extends State<UnloadingTab> {
       ),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const CircularProgressIndicator();
+          return SpinKitThreeBounce(
+            color: Color.fromARGB(255, 249, 139, 71),
+            size: 30.0,
+          );
         } else if (snapshot.hasError) {
           return Text('Error: ${snapshot.error}');
         } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
@@ -281,8 +391,8 @@ class _UnloadingTabState extends State<UnloadingTab> {
                       )
                       .toList(),
               value: selectedLorry,
-              hint: const Text('Select Lorry'),
-              searchHint: const Text('Search lorry'),
+              hint: const Text('Select Truck'),
+              searchHint: const Text('Search Truck'),
               onChanged: (value) {
                 setState(() {
                   selectedLorry = value;
@@ -301,7 +411,10 @@ class _UnloadingTabState extends State<UnloadingTab> {
       future: fetchCustomers(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const CircularProgressIndicator();
+          return SpinKitThreeBounce(
+            color: Color.fromARGB(255, 249, 139, 71),
+            size: 30.0,
+          );
         } else if (snapshot.hasError) {
           return Text('Error: ${snapshot.error}');
         } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
@@ -348,7 +461,10 @@ class _UnloadingTabState extends State<UnloadingTab> {
       future: fetchPoNumbers(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const CircularProgressIndicator();
+          return SpinKitThreeBounce(
+            color: Color.fromARGB(255, 249, 139, 71),
+            size: 30.0,
+          );
         } else if (snapshot.hasError) {
           return Text('Error: ${snapshot.error}');
         } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
@@ -390,49 +506,136 @@ class _UnloadingTabState extends State<UnloadingTab> {
     );
   }
 
-  Widget _buildLocationDetails(UserProvider userProvider) {
-    return Column(
-      children: [
-        if (userProvider.subLocationId.isNotEmpty)
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8.0),
-            child: Text(
-              'Sub Location: ${userProvider.subLocationId}',
-              style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Color.fromARGB(255, 249, 139, 71),
-              ),
+  Widget _buildLocationDetailsCard(UserProvider userProvider) {
+    return Positioned(
+      left: 16, // Position the card on the right side of the screen
+      top: 16, // Adjust the top position as needed
+      child: Card(
+        elevation: 5,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+        child: Container(
+          width: 300,
+
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                const Color.fromARGB(255, 249, 139, 71),
+                const Color.fromARGB(255, 255, 183, 77),
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
             ),
+            borderRadius: BorderRadius.circular(15),
           ),
-        if (userProvider.divisionsId.isNotEmpty)
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8.0),
-            child: Text(
-              'Division: ${userProvider.divisionsId}',
-              style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Color.fromARGB(255, 249, 139, 71),
+          child: Row(
+            children: [
+              // Details (Sub Location and Division)
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (userProvider.subLocationName.isNotEmpty)
+                      Text(
+                        'Sub Location: ${userProvider.subLocationName}',
+                        style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                    if (userProvider.divisionsName.isNotEmpty)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 8.0),
+                        child: Text(
+                          'Division: ${userProvider.divisionsName}',
+                          style: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
               ),
-            ),
+              // Image on the right side
+              const SizedBox(width: 10),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(10),
+                child: Image.asset(
+                  'assets/images/crate_image.png', // Add your image to assets
+                  width: 60,
+                  height: 60,
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ],
           ),
-      ],
+        ),
+      ),
     );
   }
 
   Widget _buildStartScanButton() {
-    return ElevatedButton(
-      onPressed: selectedLorry != null ? _startScan : null,
-      style: ElevatedButton.styleFrom(
-        backgroundColor:
-            selectedLorry != null
-                ? const Color.fromARGB(255, 249, 139, 71)
-                : Colors.grey,
-        padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
-        textStyle: const TextStyle(fontSize: 18),
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        // Camera Logo with Orange Color
+        Icon(
+          Icons.camera_alt,
+          size: 100,
+          color: const Color.fromARGB(255, 249, 139, 71), // Orange color
+        ),
+        const SizedBox(height: 20),
+        // Title
+        const Text(
+          "Scan the QR Code",
+          style: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+            color: Colors.black,
+          ),
+        ),
+        const SizedBox(height: 10),
+        // Subtitle
+        const Text(
+          "Please scan the crate details",
+          style: TextStyle(fontSize: 16, color: Colors.grey),
+        ),
+        const SizedBox(height: 30),
+        // Start Scan Button
+        ElevatedButton(
+          onPressed: selectedLorry != null ? _startScan : null,
+          style: ElevatedButton.styleFrom(
+            backgroundColor:
+                selectedLorry != null
+                    ? const Color.fromARGB(255, 249, 139, 71) // Orange color
+                    : Colors.grey,
+            foregroundColor: Colors.white, // Ensures text color is white
+            padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+            textStyle: const TextStyle(fontSize: 18),
+          ),
+          child: const Text("Start Scan"),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildBackgroundImage() {
+    return Container(
+      decoration: BoxDecoration(
+        image: DecorationImage(
+          image: const AssetImage(
+            'assets/images/background_pattern.jpg',
+          ), // Add your image to assets
+          fit: BoxFit.cover,
+          colorFilter: ColorFilter.mode(
+            Colors.white.withOpacity(0.9), // Fade effect
+            BlendMode.lighten,
+          ),
+        ),
       ),
-      child: const Text("Start Scan"),
     );
   }
 
@@ -494,16 +697,40 @@ class _UnloadingTabState extends State<UnloadingTab> {
               ),
               Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: ElevatedButton(
-                  onPressed: _doneScanning,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 40,
-                      vertical: 15,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    ElevatedButton(
+                      onPressed: _doneScanning,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color.fromARGB(
+                          255,
+                          5,
+                          168,
+                          29,
+                        ), // Orange color
+                        foregroundColor: Colors.white, // White text
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 30,
+                          vertical: 15,
+                        ),
+                      ),
+                      child: const Text("Done Scanning"),
                     ),
-                  ),
-                  child: const Text("Done Scanning"),
+                    const SizedBox(width: 20), // Space between buttons
+                    ElevatedButton(
+                      onPressed: _resetPage,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.red, // Red color for exit
+                        foregroundColor: Colors.white, // White text
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 30,
+                          vertical: 15,
+                        ),
+                      ),
+                      child: const Text("Exit"),
+                    ),
+                  ],
                 ),
               ),
             ],

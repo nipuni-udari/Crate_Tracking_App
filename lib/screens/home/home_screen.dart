@@ -49,6 +49,9 @@ class _HomeScreenState extends State<HomeScreen> {
           userTypeId: user['user_type_id'].toString(),
           subLocationId: user['sub_location_id'].toString(),
           divisionsId: user['divisions_id'].toString(),
+          divisionsName: user['division_name'].toString(),
+          UserType: user['user_type'].toString(),
+          subLocationName: user['sub_location_name'].toString(),
         );
       } else {
         print("User not found: ${data['message']}");

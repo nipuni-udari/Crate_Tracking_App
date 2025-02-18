@@ -31,9 +31,21 @@ class BottomNavBar extends StatelessWidget {
         return;
     }
 
+    // Using PageRouteBuilder for custom fade transition animation
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (context) => screen),
+      PageRouteBuilder(
+        pageBuilder: (context, animation, secondaryAnimation) => screen,
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          // Define fade transition
+          var opacityAnimation = Tween(begin: 0.0, end: 1.0).animate(animation);
+
+          return FadeTransition(opacity: opacityAnimation, child: child);
+        },
+        transitionDuration: const Duration(
+          milliseconds: 600,
+        ), // Set duration for smoothness
+      ),
     );
   }
 
@@ -46,7 +58,6 @@ class BottomNavBar extends StatelessWidget {
       selectedItemColor: Colors.white,
       unselectedItemColor: const Color.fromARGB(255, 112, 112, 112),
       type: BottomNavigationBarType.fixed,
-
       elevation: 10,
       items: const [
         BottomNavigationBarItem(
@@ -55,7 +66,7 @@ class BottomNavBar extends StatelessWidget {
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.shopping_cart, size: 30),
-          label: 'Crate loading',
+          label: 'Crate Track',
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.person, size: 30),

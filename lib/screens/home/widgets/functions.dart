@@ -1,10 +1,125 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+
+class FunctionsWidget extends StatefulWidget {
+  const FunctionsWidget({Key? key}) : super(key: key);
+
+  @override
+  _FunctionsWidgetState createState() => _FunctionsWidgetState();
+}
+
+class _FunctionsWidgetState extends State<FunctionsWidget> {
+  final TextEditingController _truckNoController = TextEditingController();
+  String loadingCount = '0';
+  String unloadingCount = '0';
+  String receivingCount = '0';
+
+  Future<void> searchTruck() async {
+    String truckNo = _truckNoController.text.trim();
+    if (truckNo.isEmpty) return;
+
+    final response = await http.post(
+      Uri.parse(
+        'https://demo.secretary.lk/cargills_app/backend/crate_tracking_counts.php',
+      ),
+      body: {'truckNo': truckNo},
+    );
+
+    if (response.statusCode == 200) {
+      var data = json.decode(response.body);
+      setState(() {
+        loadingCount = data['loading']?.toString() ?? '0';
+        unloadingCount = data['unloading']?.toString() ?? '0';
+        receivingCount = data['receiving']?.toString() ?? '0';
+      });
+    } else {
+      print("Failed to fetch data");
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Center(
+            child: SizedBox(
+              width: MediaQuery.of(context).size.width * 0.9,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: Colors.orange, width: 2),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.orange.withOpacity(0.5),
+                      blurRadius: 6,
+                      offset: const Offset(0, 3),
+                    ),
+                  ],
+                ),
+                child: TextField(
+                  controller: _truckNoController,
+                  style: const TextStyle(color: Colors.orange),
+                  keyboardType: TextInputType.text,
+                  decoration: InputDecoration(
+                    filled: true,
+                    fillColor: Colors.white,
+                    labelText: 'Enter Truck No',
+                    labelStyle: const TextStyle(color: Colors.orange),
+                    border: InputBorder.none,
+                    prefixIcon: const Icon(
+                      Icons.local_shipping,
+                      color: Colors.orange,
+                    ),
+                    suffixIcon: IconButton(
+                      icon: const Icon(Icons.search, color: Colors.orange),
+                      onPressed: searchTruck,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+
+        // Updated Function Cards
+        FunctionCard(
+          title: "Loading",
+          description: "Loading crates to the truck",
+          imagePath: "assets/images/loading.png",
+          count: loadingCount,
+          lable: 'Crate count',
+        ),
+        const SizedBox(height: 15),
+        FunctionCard(
+          title: "Unloading",
+          description: "Unloading crates from the truck",
+          imagePath: "assets/images/unloading.webp",
+          count: unloadingCount,
+          lable: 'Crate count',
+        ),
+        const SizedBox(height: 15),
+        FunctionCard(
+          title: "Receiving",
+          description: "Collecting crates from the customer",
+          imagePath: "assets/images/receiving.jpg",
+          count: receivingCount,
+          lable: 'Crate count',
+        ),
+      ],
+    );
+  }
+}
 
 class FunctionCard extends StatelessWidget {
   final String title;
   final String description;
   final String imagePath;
-  final double count;
+  final String count; // Changed from double to String
   final String lable;
 
   const FunctionCard({
@@ -19,7 +134,7 @@ class FunctionCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: MediaQuery.of(context).size.width * 0.9, // 90% of screen width
+      width: MediaQuery.of(context).size.width * 0.9,
       child: Card(
         color: Colors.white,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
@@ -28,7 +143,6 @@ class FunctionCard extends StatelessWidget {
           padding: const EdgeInsets.all(12.0),
           child: Row(
             children: [
-              // Left side: Content
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -36,11 +150,14 @@ class FunctionCard extends StatelessWidget {
                   children: [
                     Row(
                       children: [
-                        const Icon(Icons.star, color: Colors.orange, size: 18),
+                        const Icon(Icons.star, color: Colors.orange, size: 20),
                         const SizedBox(width: 5),
                         Text(
-                          count.toString(),
-                          style: const TextStyle(fontWeight: FontWeight.bold),
+                          count,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 20,
+                          ),
                         ),
                       ],
                     ),
@@ -63,7 +180,7 @@ class FunctionCard extends StatelessWidget {
                         Text(
                           "Add",
                           style: const TextStyle(
-                            fontSize: 16,
+                            fontSize: 12,
                             fontWeight: FontWeight.bold,
                             color: Colors.orange,
                           ),
@@ -74,7 +191,7 @@ class FunctionCard extends StatelessWidget {
                           radius: 18,
                           child: IconButton(
                             icon: const Icon(
-                              Icons.add,
+                              Icons.fire_truck,
                               color: Colors.white,
                               size: 20,
                             ),
@@ -88,14 +205,12 @@ class FunctionCard extends StatelessWidget {
                   ],
                 ),
               ),
-
-              // Right side: Full height image
               ClipRRect(
                 borderRadius: BorderRadius.circular(12),
                 child: Image.asset(
                   imagePath,
-                  width: 200, // Adjust width as needed
-                  height: 100, // Adjust height as needed
+                  width: 200,
+                  height: 100,
                   fit: BoxFit.cover,
                 ),
               ),
@@ -103,41 +218,6 @@ class FunctionCard extends StatelessWidget {
           ),
         ),
       ),
-    );
-  }
-}
-
-class FunctionsWidget extends StatelessWidget {
-  const FunctionsWidget({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        FunctionCard(
-          title: "Loading",
-          description: "Loading crates to the truck",
-          imagePath: "assets/images/loading.png",
-          count: 3.8,
-          lable: 'Add',
-        ),
-        const SizedBox(height: 15),
-        FunctionCard(
-          title: "Unloading",
-          description: "unloading crates from the truck",
-          imagePath: "assets/images/unloading.webp",
-          count: 4.5,
-          lable: 'Add',
-        ),
-        const SizedBox(height: 15),
-        FunctionCard(
-          title: "Receiving",
-          description: "collecting crates from the customer",
-          imagePath: "assets/images/receiving.jpg",
-          count: 4.2,
-          lable: 'Add',
-        ),
-      ],
     );
   }
 }

@@ -7,6 +7,9 @@ class UserProvider with ChangeNotifier {
   String userTypeId = '';
   String subLocationId = '';
   String divisionsId = '';
+  String divisionsName = '';
+  String UserType = '';
+  String subLocationName = '';
 
   void setUser({
     required String mobileNumber,
@@ -15,6 +18,9 @@ class UserProvider with ChangeNotifier {
     String? userTypeId,
     String? subLocationId,
     String? divisionsId,
+    String? divisionsName,
+    String? UserType,
+    String? subLocationName,
   }) {
     this.mobileNumber = mobileNumber;
     if (username != null) this.username = username;
@@ -22,6 +28,9 @@ class UserProvider with ChangeNotifier {
     if (userTypeId != null) this.userTypeId = userTypeId;
     if (subLocationId != null) this.subLocationId = subLocationId;
     if (divisionsId != null) this.divisionsId = divisionsId;
+    if (divisionsName != null) this.divisionsName = divisionsName;
+    if (UserType != null) this.UserType = UserType;
+    if (subLocationName != null) this.subLocationName = subLocationName;
     notifyListeners();
   }
 }
