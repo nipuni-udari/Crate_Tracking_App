@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'package:crate_tracking/screens/bottom_nav_bar.dart';
 import 'package:crate_tracking/screens/home/widgets/functions.dart';
-import 'package:crate_tracking/screens/home/widgets/special_offer_banner.dart';
 import 'package:crate_tracking/user_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -123,7 +122,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: const [
-                  SpecialOfferBanner(),
+                  //SpecialOfferBanner(),
                   SizedBox(height: 20),
                   FunctionsWidget(),
                 ],

@@ -44,8 +44,8 @@ class _CrateScreenState extends State<CrateScreen>
           unselectedLabelColor: Colors.white, // Inactive tab text color
           tabs: const [
             Tab(text: "Loading"),
-            Tab(text: "Unloading"),
-            Tab(text: "Collecting"),
+            //Tab(text: "Unloading"),
+            //Tab(text: "Collecting"),
             Tab(text: "Receiving"),
           ],
         ),
@@ -54,8 +54,8 @@ class _CrateScreenState extends State<CrateScreen>
         controller: _tabController,
         children: const [
           LoadingTab(),
-          UnloadingTab(),
-          CollectingTab(),
+          //UnloadingTab(),
+          //CollectingTab(),
           ReceivingTab(),
         ],
       ),

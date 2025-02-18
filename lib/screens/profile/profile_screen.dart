@@ -19,7 +19,10 @@ class ProfileScreen extends StatelessWidget {
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [Color.fromARGB(255, 247, 141, 4), Colors.white],
+            colors: [
+              Color.fromARGB(255, 249, 139, 71),
+              Color.fromARGB(255, 255, 230, 9),
+            ],
           ),
         ),
         child: SafeArea(
