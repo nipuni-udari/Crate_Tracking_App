@@ -13,6 +13,7 @@ class _FunctionsWidgetState extends State<FunctionsWidget> {
   final TextEditingController _truckNoController = TextEditingController();
   String loadingCount = '0';
   String unloadingCount = '0';
+  String collectingCount = '0';
   String receivingCount = '0';
   String exactCratesCount = '0';
   String systemCratesCount = '0';
@@ -33,6 +34,7 @@ class _FunctionsWidgetState extends State<FunctionsWidget> {
       setState(() {
         loadingCount = data['loading']?.toString() ?? '0';
         unloadingCount = data['unloading']?.toString() ?? '0';
+        collectingCount = data['collecting']?.toString() ?? '0';
         receivingCount = data['receiving']?.toString() ?? '0';
         exactCratesCount = data['exact_crates_count']?.toString() ?? '0';
         systemCratesCount = data['system_crates_count']?.toString() ?? '0';
@@ -74,7 +76,7 @@ class _FunctionsWidgetState extends State<FunctionsWidget> {
                 child: TextField(
                   controller: _truckNoController,
                   style: const TextStyle(color: Colors.orange),
-                  keyboardType: TextInputType.text,
+                  keyboardType: TextInputType.number,
                   decoration: InputDecoration(
                     filled: true,
                     fillColor: Colors.white,
@@ -116,8 +118,17 @@ class _FunctionsWidgetState extends State<FunctionsWidget> {
         ),
         const SizedBox(height: 15),
         FunctionCard(
-          title: "Receiving",
+          title: "Collecting",
           description: "Collecting crates from the customer",
+          imagePath: "assets/images/collect.webp",
+          count: collectingCount,
+          lable: 'Crate count',
+          exactCount: exactCratesCount,
+        ),
+        const SizedBox(height: 15),
+        FunctionCard(
+          title: "Receiving",
+          description: "Hand over crates to the warehouse",
           imagePath: "assets/images/receiving.jpg",
           count: receivingCount,
           lable: 'Crate count',
