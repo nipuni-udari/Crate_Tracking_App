@@ -180,6 +180,8 @@ class _UnloadingTabState extends State<UnloadingTab> {
       setState(() {
         if (response.statusCode == 200 && responseData["status"] == "success") {
           serverResponse = "Crate $serialNumber saved successfully!";
+        } else if (responseData["status"] == "duplicate") {
+          serverResponse = "You have already scanned this crate.";
         } else {
           serverResponse = "Failed to save crate: ${responseData["message"]}";
         }
