@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:crate_tracking/screens/bottom_nav_bar.dart';
 import 'package:crate_tracking/screens/crates/loading_tab.dart';
-import 'package:crate_tracking/screens/crates/unloading_tab.dart';
-import 'package:crate_tracking/screens/crates/collecting_tab.dart';
+//import 'package:crate_tracking/screens/crates/unloading_tab.dart';
+//import 'package:crate_tracking/screens/crates/collecting_tab.dart';
 import 'package:crate_tracking/screens/crates/receiving_tab.dart';
 
 class CrateScreen extends StatefulWidget {
