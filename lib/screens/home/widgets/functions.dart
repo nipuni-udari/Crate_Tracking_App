@@ -1,6 +1,8 @@
+import 'package:crate_tracking/user_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:provider/provider.dart';
 
 class FunctionsWidget extends StatefulWidget {
   const FunctionsWidget({Key? key}) : super(key: key);
@@ -17,6 +19,7 @@ class _FunctionsWidgetState extends State<FunctionsWidget> {
   String receivingCount = '0';
   String exactCratesCount = '0';
   String systemCratesCount = '0';
+  String _totalCrates = '0'; // New Variable
 
   Future<void> searchTruck() async {
     String truckNo = _truckNoController.text.trim();
@@ -44,6 +47,31 @@ class _FunctionsWidgetState extends State<FunctionsWidget> {
     }
   }
 
+  Future<void> fetchTotalCrates(String subLocationId) async {
+    final response = await http.post(
+      Uri.parse(
+        'https://demo.secretary.lk/cargills_app/loading_person/backend/warehouse_total_crate_count.php',
+      ),
+      body: {'sub_location_id': subLocationId},
+    );
+
+    if (response.statusCode == 200) {
+      var data = json.decode(response.body);
+      setState(() {
+        _totalCrates = data['total_crates']?.toString() ?? '0';
+      });
+    } else {
+      print("Failed to fetch total crates");
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    fetchTotalCrates(userProvider.subLocationId);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -52,6 +80,7 @@ class _FunctionsWidgetState extends State<FunctionsWidget> {
         SpecialOfferBanner(
           exactCratesCount: exactCratesCount,
           systemCratesCount: systemCratesCount,
+          totalCrates: _totalCrates,
         ),
         // TextField for Truck No
         Padding(
@@ -301,9 +330,11 @@ class _FunctionCardState extends State<FunctionCard>
 class SpecialOfferBanner extends StatefulWidget {
   final String exactCratesCount;
   final String systemCratesCount;
+  final String totalCrates;
 
   const SpecialOfferBanner({
     Key? key,
+    required this.totalCrates,
     required this.exactCratesCount,
     required this.systemCratesCount,
   }) : super(key: key);
@@ -409,7 +440,10 @@ class _SpecialOfferBannerState extends State<SpecialOfferBanner>
                       children: [
                         // Animated Number
                         TweenAnimationBuilder(
-                          tween: IntTween(begin: 0, end: 1001),
+                          tween: IntTween(
+                            begin: 0,
+                            end: int.parse(widget.totalCrates),
+                          ),
                           duration: Duration(seconds: 2),
                           builder: (context, int value, child) {
                             return Text(
