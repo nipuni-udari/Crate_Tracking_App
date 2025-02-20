@@ -28,7 +28,7 @@ class _CollectingTabState extends State<CollectingTab> {
   ) async {
     final response = await http.post(
       Uri.parse(
-        'https://demo.secretary.lk/cargills_app/backend/vehicle_details.php',
+        'https://demo.secretary.lk/cargills_app/loading_person/backend/vehicle_details.php',
       ),
       body: {'sub_location_id': subLocationId, 'division_id': divisionId},
     );
@@ -78,7 +78,7 @@ class _CollectingTabState extends State<CollectingTab> {
     try {
       final response = await http.post(
         Uri.parse(
-          'https://demo.secretary.lk/cargills_app/backend/save_collect_total_crates.php',
+          'https://demo.secretary.lk/cargills_app/loading_person/backend/save_collect_total_crates.php',
         ),
         body: {
           'vehicle_no': selectedLorry!,
@@ -125,7 +125,7 @@ class _CollectingTabState extends State<CollectingTab> {
     try {
       final response = await http.post(
         Uri.parse(
-          'https://demo.secretary.lk/cargills_app/backend/collecting_crate_log.php',
+          'https://demo.secretary.lk/cargills_app/loading_person/backend/collecting_crate_log.php',
         ),
         body: {'serial': serialNumber, 'vehicle_no': selectedLorry!},
       );

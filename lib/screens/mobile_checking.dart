@@ -26,8 +26,9 @@ class _MobileScreenState extends State<MobileScreen>
       _isLoading = true;
     });
 
-    final url =
-        Uri.parse('https://demo.secretary.lk/cargills_app/backend/otp_sms.php');
+    final url = Uri.parse(
+      'https://demo.secretary.lk/cargills_app/loading_person/backend/otp_sms.php',
+    );
 
     try {
       final response = await http.post(url, body: {'mobile': mobileNumber});
@@ -36,12 +37,12 @@ class _MobileScreenState extends State<MobileScreen>
         final data = jsonDecode(response.body);
         switch (data['status']) {
           case 'success':
-            Navigator.of(context).push(MaterialPageRoute(
-              builder: (context) => OtpScreen(
-                mobileNumber: mobileNumber,
-                otp: '',
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder:
+                    (context) => OtpScreen(mobileNumber: mobileNumber, otp: ''),
               ),
-            ));
+            );
             break;
 
           case 'exists':
@@ -63,8 +64,9 @@ class _MobileScreenState extends State<MobileScreen>
         }
       } else {
         _showAlert(
-            'HTTP Error: ${response.statusCode}. Please try again later.',
-            null);
+          'HTTP Error: ${response.statusCode}. Please try again later.',
+          null,
+        );
       }
     } catch (e) {
       _showAlert('An error occurred: ${e.toString()}', null);
@@ -78,19 +80,20 @@ class _MobileScreenState extends State<MobileScreen>
   void _showAlert(String message, VoidCallback? onOkPressed) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Alert'),
-        content: Text(message),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              if (onOkPressed != null) onOkPressed();
-            },
-            child: const Text('OK'),
+      builder:
+          (context) => AlertDialog(
+            title: const Text('Alert'),
+            content: Text(message),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  if (onOkPressed != null) onOkPressed();
+                },
+                child: const Text('OK'),
+              ),
+            ],
           ),
-        ],
-      ),
     );
   }
 
@@ -102,9 +105,9 @@ class _MobileScreenState extends State<MobileScreen>
   Future<void> _resetForm() async {
     await Future.delayed(const Duration(seconds: 1));
     _mobileController.clear();
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Form reset successfully!')),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text('Form reset successfully!')));
   }
 
   @override
@@ -117,8 +120,9 @@ class _MobileScreenState extends State<MobileScreen>
           child: SingleChildScrollView(
             physics: const AlwaysScrollableScrollPhysics(),
             child: FadeIn(
-              duration:
-                  const Duration(milliseconds: 1000), // Page fade-in animation
+              duration: const Duration(
+                milliseconds: 1000,
+              ), // Page fade-in animation
               child: Container(
                 height: MediaQuery.of(context).size.height,
                 decoration: BoxDecoration(
@@ -129,8 +133,10 @@ class _MobileScreenState extends State<MobileScreen>
                   ),
                 ),
                 child: Padding(
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 24, horizontal: 32),
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 24,
+                    horizontal: 32,
+                  ),
                   child: Column(
                     children: [
                       // Back Button
@@ -232,12 +238,16 @@ class _MobileScreenState extends State<MobileScreen>
                                       _mobileController.text.trim();
                                   if (mobileNumber.isEmpty) {
                                     _showAlert(
-                                        'Please enter a mobile number.', null);
+                                      'Please enter a mobile number.',
+                                      null,
+                                    );
                                   } else if (!_isValidMobileNumber(
-                                      mobileNumber)) {
+                                    mobileNumber,
+                                  )) {
                                     _showAlert(
-                                        'Please enter a valid mobile number.',
-                                        null);
+                                      'Please enter a valid mobile number.',
+                                      null,
+                                    );
                                   } else {
                                     sendOtp(mobileNumber);
                                   }
@@ -245,30 +255,33 @@ class _MobileScreenState extends State<MobileScreen>
                                 style: ButtonStyle(
                                   foregroundColor:
                                       MaterialStateProperty.all<Color>(
-                                          Colors.white),
+                                        Colors.white,
+                                      ),
                                   backgroundColor:
                                       MaterialStateProperty.all<Color>(
-                                    buttonColor,
-                                  ),
+                                        buttonColor,
+                                      ),
                                   shape: MaterialStateProperty.all<
-                                      RoundedRectangleBorder>(
+                                    RoundedRectangleBorder
+                                  >(
                                     RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(24.0),
                                     ),
                                   ),
                                 ),
-                                child: _isLoading
-                                    ? const Text(
-                                        'Sending...',
-                                        style: TextStyle(fontSize: 16),
-                                      )
-                                    : const Padding(
-                                        padding: EdgeInsets.all(14.0),
-                                        child: Text(
-                                          'Send',
+                                child:
+                                    _isLoading
+                                        ? const Text(
+                                          'Sending...',
                                           style: TextStyle(fontSize: 16),
+                                        )
+                                        : const Padding(
+                                          padding: EdgeInsets.all(14.0),
+                                          child: Text(
+                                            'Send',
+                                            style: TextStyle(fontSize: 16),
+                                          ),
                                         ),
-                                      ),
                               ),
                             ),
                           ],

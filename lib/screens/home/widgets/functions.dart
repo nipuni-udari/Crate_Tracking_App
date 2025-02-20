@@ -24,7 +24,7 @@ class _FunctionsWidgetState extends State<FunctionsWidget> {
 
     final response = await http.post(
       Uri.parse(
-        'https://demo.secretary.lk/cargills_app/backend/crate_tracking_counts.php',
+        'https://demo.secretary.lk/cargills_app/loading_person/backend/crate_tracking_counts.php',
       ),
       body: {'truckNo': truckNo},
     );

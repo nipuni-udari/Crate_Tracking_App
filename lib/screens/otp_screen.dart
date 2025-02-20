@@ -34,7 +34,7 @@ class _OtpScreenState extends State<OtpScreen> {
 
     final response = await http.post(
       Uri.parse(
-        'https://demo.secretary.lk/cargills_app/backend/otp_verify.php',
+        'https://demo.secretary.lk/cargills_app/loading_person/backend/otp_verify.php',
       ),
       body: {'mobile': widget.mobileNumber, 'otp': otp},
     );

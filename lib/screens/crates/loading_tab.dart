@@ -28,7 +28,7 @@ class _LoadingTabState extends State<LoadingTab> {
   ) async {
     final response = await http.post(
       Uri.parse(
-        'https://demo.secretary.lk/cargills_app/backend/vehicle_details.php',
+        'https://demo.secretary.lk/cargills_app/loading_person/backend/vehicle_details.php',
       ),
       body: {'sub_location_id': subLocationId, 'division_id': divisionId},
     );
@@ -78,7 +78,7 @@ class _LoadingTabState extends State<LoadingTab> {
     try {
       final response = await http.post(
         Uri.parse(
-          'https://demo.secretary.lk/cargills_app/backend/save_load_total_crates.php',
+          'https://demo.secretary.lk/cargills_app/loading_person/backend/save_load_total_crates.php',
         ),
         body: {
           'vehicle_no': selectedLorry!,
@@ -124,7 +124,7 @@ class _LoadingTabState extends State<LoadingTab> {
     try {
       final response = await http.post(
         Uri.parse(
-          'https://demo.secretary.lk/cargills_app/backend/loading_crate_log.php',
+          'https://demo.secretary.lk/cargills_app/loading_person/backend/loading_crate_log.php',
         ),
         body: {'serial': serialNumber, 'vehicle_no': selectedLorry!},
       );
@@ -133,8 +133,6 @@ class _LoadingTabState extends State<LoadingTab> {
       setState(() {
         if (response.statusCode == 200 && responseData["status"] == "success") {
           serverResponse = "Crate $serialNumber saved successfully!";
-        } else if (responseData["status"] == "duplicate") {
-          serverResponse = "You have already scanned this crate.";
         } else {
           serverResponse = "Failed to save crate: ${responseData["message"]}";
         }

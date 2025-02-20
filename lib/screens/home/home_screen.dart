@@ -18,7 +18,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   Future<void> fetchUserDetails() async {
     final url = Uri.parse(
-      "https://demo.secretary.lk/cargills_app/backend/user_details.php",
+      "https://demo.secretary.lk/cargills_app/loading_person/backend/user_details.php",
     );
 
     try {

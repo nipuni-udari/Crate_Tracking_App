@@ -33,7 +33,7 @@ class _UnloadingTabState extends State<UnloadingTab> {
   ) async {
     final response = await http.post(
       Uri.parse(
-        'https://demo.secretary.lk/cargills_app/backend/vehicle_details.php',
+        'https://demo.secretary.lk/cargills_app/loading_person/backend/vehicle_details.php',
       ),
       body: {'sub_location_id': subLocationId, 'division_id': divisionId},
     );
@@ -48,7 +48,9 @@ class _UnloadingTabState extends State<UnloadingTab> {
 
   Future<List<String>> fetchCustomers() async {
     final response = await http.post(
-      Uri.parse('https://demo.secretary.lk/cargills_app/backend/customers.php'),
+      Uri.parse(
+        'https://demo.secretary.lk/cargills_app/loading_person/backend/customers.php',
+      ),
     );
     print("Response Code: ${response.statusCode}");
     print("Response Body: ${response.body}");
@@ -63,7 +65,7 @@ class _UnloadingTabState extends State<UnloadingTab> {
   Future<List<String>> fetchPoNumbers() async {
     final response = await http.post(
       Uri.parse(
-        'https://demo.secretary.lk/cargills_app/backend/po_numbers.php',
+        'https://demo.secretary.lk/cargills_app/loading_person/backend/po_numbers.php',
       ),
     );
 
@@ -116,7 +118,7 @@ class _UnloadingTabState extends State<UnloadingTab> {
     try {
       final response = await http.post(
         Uri.parse(
-          'https://demo.secretary.lk/cargills_app/backend/save_unload_total_crates.php',
+          'https://demo.secretary.lk/cargills_app/loading_person/backend/save_unload_total_crates.php',
         ),
         body: {
           'vehicle_no': selectedLorry!,
@@ -166,7 +168,7 @@ class _UnloadingTabState extends State<UnloadingTab> {
 
       final response = await http.post(
         Uri.parse(
-          'https://demo.secretary.lk/cargills_app/backend/unloading_crate_log.php',
+          'https://demo.secretary.lk/cargills_app/loading_person/backend/unloading_crate_log.php',
         ),
         body: {
           'serial': serialNumber,
