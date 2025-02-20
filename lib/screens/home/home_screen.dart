@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io'; // Import for SocketException
 import 'package:crate_tracking/screens/bottom_nav_bar.dart';
 import 'package:crate_tracking/screens/home/widgets/functions.dart';
 import 'package:crate_tracking/user_provider.dart';
@@ -55,6 +56,14 @@ class _HomeScreenState extends State<HomeScreen> {
       } else {
         print("User not found: ${data['message']}");
       }
+    } on SocketException {
+      // Show Snackbar with "No internet connection" message
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("No internet connection"),
+          backgroundColor: Colors.red,
+        ),
+      );
     } catch (e) {
       print("Error fetching user details: $e");
     }
@@ -107,10 +116,9 @@ class _HomeScreenState extends State<HomeScreen> {
           Container(
             decoration: BoxDecoration(
               image: DecorationImage(
-                opacity:
-                    0.1, // Adjust transparency level (0.0 - fully transparent, 1.0 - fully visible)
+                opacity: 0.1,
                 image: AssetImage("assets/images/background_pattern.jpg"),
-                repeat: ImageRepeat.repeat, // Makes the background repeat
+                repeat: ImageRepeat.repeat,
               ),
             ),
           ),
@@ -121,11 +129,7 @@ class _HomeScreenState extends State<HomeScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
-                children: const [
-                  //SpecialOfferBanner(),
-                  SizedBox(height: 20),
-                  FunctionsWidget(),
-                ],
+                children: const [SizedBox(height: 20), FunctionsWidget()],
               ),
             ),
           ),

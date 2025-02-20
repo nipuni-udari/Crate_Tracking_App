@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'otp_screen.dart';
 import 'package:animate_do/animate_do.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 
 class MobileScreen extends StatefulWidget {
   const MobileScreen({Key? key}) : super(key: key);
@@ -69,7 +70,7 @@ class _MobileScreenState extends State<MobileScreen>
         );
       }
     } catch (e) {
-      _showAlert('An error occurred: ${e.toString()}', null);
+      _showAlert('No internet connection.please try again later.', null);
     } finally {
       setState(() {
         _isLoading = false;

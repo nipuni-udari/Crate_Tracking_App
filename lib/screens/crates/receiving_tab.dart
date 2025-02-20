@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:mobile_scanner/mobile_scanner.dart';
@@ -21,23 +22,28 @@ class _ReceivingTabState extends State<ReceivingTab> {
   List<String> lorryNumbers = [];
   String serverResponse = "";
   int totalScannedCrates = 0; // Add this variable
-
   Future<List<String>> fetchVehicles(
     String subLocationId,
     String divisionId,
   ) async {
-    final response = await http.post(
-      Uri.parse(
-        'https://demo.secretary.lk/cargills_app/loading_person/backend/vehicle_details.php',
-      ),
-      body: {'sub_location_id': subLocationId, 'division_id': divisionId},
-    );
+    try {
+      final response = await http.post(
+        Uri.parse(
+          'https://demo.secretary.lk/cargills_app/loading_person/backend/vehicle_details.php',
+        ),
+        body: {'sub_location_id': subLocationId, 'division_id': divisionId},
+      );
 
-    if (response.statusCode == 200) {
-      final List<dynamic> data = json.decode(response.body);
-      return List<String>.from(data);
-    } else {
-      throw Exception('Failed to load vehicles');
+      if (response.statusCode == 200) {
+        final List<dynamic> data = json.decode(response.body);
+        return List<String>.from(data);
+      } else {
+        throw Exception('Failed to load vehicles');
+      }
+    } on SocketException {
+      throw ('No internet connection');
+    } catch (e) {
+      throw Exception('An error occurred: $e');
     }
   }
 
