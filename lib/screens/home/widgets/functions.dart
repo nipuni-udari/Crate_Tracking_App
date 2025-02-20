@@ -139,7 +139,7 @@ class _FunctionsWidgetState extends State<FunctionsWidget> {
   }
 }
 
-class FunctionCard extends StatelessWidget {
+class FunctionCard extends StatefulWidget {
   final String title;
   final String description;
   final String imagePath;
@@ -158,89 +158,138 @@ class FunctionCard extends StatelessWidget {
   }) : super(key: key);
 
   @override
+  _FunctionCardState createState() => _FunctionCardState();
+}
+
+class _FunctionCardState extends State<FunctionCard>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _animation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 200),
+    );
+    _animation = Tween<double>(
+      begin: 1.0,
+      end: 1.1,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _onTapDown(TapDownDetails details) {
+    _controller.forward();
+  }
+
+  void _onTapUp(TapUpDetails details) {
+    _controller.reverse();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: MediaQuery.of(context).size.width * 0.9,
-      child: Card(
-        color: Colors.white,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-        elevation: 5,
-        child: Padding(
-          padding: const EdgeInsets.all(12.0),
-          child: Row(
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Row(
+    return GestureDetector(
+      onTapDown: _onTapDown,
+      onTapUp: _onTapUp,
+      child: ScaleTransition(
+        scale: _animation,
+        child: SizedBox(
+          width: MediaQuery.of(context).size.width * 0.9,
+          child: Card(
+            color: Colors.white,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(15),
+            ),
+            elevation: 5,
+            child: Padding(
+              padding: const EdgeInsets.all(12.0),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Icon(Icons.star, color: Colors.orange, size: 20),
-                        const SizedBox(width: 5),
-                        Text(
-                          count,
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 20,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      title,
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 5),
-                    Text(
-                      description,
-                      style: TextStyle(color: Colors.grey.shade700),
-                    ),
-                    const SizedBox(height: 10),
-                    Row(
-                      children: [
-                        Text(
-                          "Exact crates count: $exactCount",
-                          style: const TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.orange,
-                          ),
-                        ),
-                        const SizedBox(width: 10),
-                        CircleAvatar(
-                          backgroundColor: Colors.orange,
-                          radius: 18,
-                          child: IconButton(
-                            icon: const Icon(
-                              Icons.fire_truck,
-                              color: Colors.white,
+                        Row(
+                          children: [
+                            const Icon(
+                              Icons.star,
+                              color: Colors.orange,
                               size: 20,
                             ),
-                            onPressed: () {
-                              // Handle button click
-                            },
+                            const SizedBox(width: 5),
+                            Text(
+                              widget.count,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 20,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          widget.title,
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
                           ),
+                        ),
+                        const SizedBox(height: 5),
+                        Text(
+                          widget.description,
+                          style: TextStyle(color: Colors.grey.shade700),
+                        ),
+                        const SizedBox(height: 10),
+                        Row(
+                          children: [
+                            Text(
+                              "Exact crates count: ${widget.exactCount}",
+                              style: const TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.orange,
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            CircleAvatar(
+                              backgroundColor: Colors.orange,
+                              radius: 18,
+                              child: IconButton(
+                                icon: const Icon(
+                                  Icons.fire_truck,
+                                  color: Colors.white,
+                                  size: 20,
+                                ),
+                                onPressed: () {
+                                  // Handle button click
+                                },
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
-                  ],
-                ),
+                  ),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child: Image.asset(
+                      widget.imagePath,
+                      width: 200,
+                      height: 100,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                ],
               ),
-              ClipRRect(
-                borderRadius: BorderRadius.circular(12),
-                child: Image.asset(
-                  imagePath,
-                  width: 200,
-                  height: 100,
-                  fit: BoxFit.cover,
-                ),
-              ),
-            ],
+            ),
           ),
         ),
       ),
@@ -285,6 +334,7 @@ class _SpecialOfferBannerState extends State<SpecialOfferBanner>
     super.dispose();
   }
 
+  @override
   @override
   Widget build(BuildContext context) {
     return FadeTransition(
@@ -353,55 +403,87 @@ class _SpecialOfferBannerState extends State<SpecialOfferBanner>
                       ),
                     ),
                     const SizedBox(height: 12),
+
+                    // ** Animated Number (1001) and Buttons **
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
                       children: [
-                        ElevatedButton(
-                          onPressed: () {
-                            // Add your action here
+                        // Animated Number
+                        TweenAnimationBuilder(
+                          tween: IntTween(begin: 0, end: 1001),
+                          duration: Duration(seconds: 2),
+                          builder: (context, int value, child) {
+                            return Text(
+                              '$value',
+                              style: TextStyle(
+                                fontSize: 36,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.yellowAccent,
+                                shadows: [
+                                  Shadow(
+                                    color: Colors.black.withOpacity(0.5),
+                                    blurRadius: 5,
+                                    offset: Offset(2, 2),
+                                  ),
+                                ],
+                              ),
+                            );
                           },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.white,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            padding: EdgeInsets.symmetric(
-                              horizontal: 20,
-                              vertical: 10,
-                            ),
-                          ),
-                          child: Text(
-                            'Exact crate Count: ${widget.exactCratesCount}',
-                            style: TextStyle(
-                              color: Color.fromARGB(255, 252, 37, 37),
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
                         ),
-                        const SizedBox(width: 10), // Space between buttons
-                        ElevatedButton(
-                          onPressed: () {
-                            // Add your action here
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.white,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20),
+
+                        const SizedBox(
+                          width: 16,
+                        ), // Space between number and buttons
+                        // Buttons
+                        Row(
+                          children: [
+                            ElevatedButton(
+                              onPressed: () {
+                                // Add your action here
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.white,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: 20,
+                                  vertical: 10,
+                                ),
+                              ),
+                              child: Text(
+                                'Exact crate Count: ${widget.exactCratesCount}',
+                                style: TextStyle(
+                                  color: Color.fromARGB(255, 252, 37, 37),
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
                             ),
-                            padding: EdgeInsets.symmetric(
-                              horizontal: 20,
-                              vertical: 10,
+                            const SizedBox(width: 10), // Space between buttons
+                            ElevatedButton(
+                              onPressed: () {
+                                // Add your action here
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.white,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: 20,
+                                  vertical: 10,
+                                ),
+                              ),
+                              child: Text(
+                                'System crate Count: ${widget.systemCratesCount}',
+                                style: TextStyle(
+                                  color: Color.fromARGB(255, 252, 37, 37),
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
                             ),
-                          ),
-                          child: Text(
-                            'System crate Count: ${widget.systemCratesCount}',
-                            style: TextStyle(
-                              color: Color.fromARGB(255, 252, 37, 37),
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
+                          ],
                         ),
                       ],
                     ),
