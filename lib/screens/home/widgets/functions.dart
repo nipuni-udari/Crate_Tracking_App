@@ -19,11 +19,26 @@ class _FunctionsWidgetState extends State<FunctionsWidget> {
   String receivingCount = '0';
   String exactCratesCount = '0';
   String systemCratesCount = '0';
-  String _totalCrates = '0'; // New Variable
+  String _totalCrates = '0';
+
+  // New variables to store initial counts
+  String initialLoadingCount = '0';
+  String initialUnloadingCount = '0';
+  String initialCollectingCount = '0';
+  String initialReceivingCount = '0';
 
   Future<void> searchTruck() async {
     String truckNo = _truckNoController.text.trim();
-    if (truckNo.isEmpty) return;
+    if (truckNo.isEmpty) {
+      // If truck number is empty, reset to initial counts
+      setState(() {
+        loadingCount = initialLoadingCount;
+        unloadingCount = initialUnloadingCount;
+        collectingCount = initialCollectingCount;
+        receivingCount = initialReceivingCount;
+      });
+      return;
+    }
 
     final response = await http.post(
       Uri.parse(
@@ -34,6 +49,7 @@ class _FunctionsWidgetState extends State<FunctionsWidget> {
 
     if (response.statusCode == 200) {
       var data = json.decode(response.body);
+      print("Response Data: $data"); // Debugging: Print the response data
       setState(() {
         loadingCount = data['loading']?.toString() ?? '0';
         unloadingCount = data['unloading']?.toString() ?? '0';
@@ -47,7 +63,7 @@ class _FunctionsWidgetState extends State<FunctionsWidget> {
     }
   }
 
-  Future<void> fetchTotalCrates(String subLocationId) async {
+  Future<void> fetchInitialData(String subLocationId) async {
     final response = await http.post(
       Uri.parse(
         'https://demo.secretary.lk/cargills_app/loading_person/backend/warehouse_total_crate_count.php',
@@ -59,9 +75,23 @@ class _FunctionsWidgetState extends State<FunctionsWidget> {
       var data = json.decode(response.body);
       setState(() {
         _totalCrates = data['total_crates']?.toString() ?? '0';
+        initialLoadingCount =
+            data['vehicle_status'][0]['total_loading']?.toString() ?? '0';
+        initialUnloadingCount =
+            data['vehicle_status'][0]['total_unloading']?.toString() ?? '0';
+        initialCollectingCount =
+            data['vehicle_status'][0]['total_collecting']?.toString() ?? '0';
+        initialReceivingCount =
+            data['vehicle_status'][0]['total_receiving']?.toString() ?? '0';
+
+        // Set initial counts to the current counts
+        loadingCount = initialLoadingCount;
+        unloadingCount = initialUnloadingCount;
+        collectingCount = initialCollectingCount;
+        receivingCount = initialReceivingCount;
       });
     } else {
-      print("Failed to fetch total crates");
+      print("Failed to fetch initial data");
     }
   }
 
@@ -69,7 +99,7 @@ class _FunctionsWidgetState extends State<FunctionsWidget> {
   void initState() {
     super.initState();
     final userProvider = Provider.of<UserProvider>(context, listen: false);
-    fetchTotalCrates(userProvider.subLocationId);
+    fetchInitialData(userProvider.subLocationId);
   }
 
   @override
@@ -135,6 +165,7 @@ class _FunctionsWidgetState extends State<FunctionsWidget> {
           count: loadingCount,
           lable: 'Crate count',
           exactCount: exactCratesCount,
+          totalCrates: int.tryParse(_totalCrates) ?? 0,
         ),
         const SizedBox(height: 15),
         FunctionCard(
@@ -144,6 +175,7 @@ class _FunctionsWidgetState extends State<FunctionsWidget> {
           count: unloadingCount,
           lable: 'Crate count',
           exactCount: exactCratesCount,
+          totalCrates: int.tryParse(_totalCrates) ?? 0,
         ),
         const SizedBox(height: 15),
         FunctionCard(
@@ -153,6 +185,7 @@ class _FunctionsWidgetState extends State<FunctionsWidget> {
           count: collectingCount,
           lable: 'Crate count',
           exactCount: exactCratesCount,
+          totalCrates: int.tryParse(_totalCrates) ?? 0,
         ),
         const SizedBox(height: 15),
         FunctionCard(
@@ -162,6 +195,7 @@ class _FunctionsWidgetState extends State<FunctionsWidget> {
           count: receivingCount,
           lable: 'Crate count',
           exactCount: exactCratesCount,
+          totalCrates: int.tryParse(_totalCrates) ?? 0,
         ),
       ],
     );
@@ -175,6 +209,7 @@ class FunctionCard extends StatefulWidget {
   final String count;
   final String lable;
   final String exactCount;
+  final int totalCrates; // Add totalCrates to calculate percentage
 
   const FunctionCard({
     Key? key,
@@ -184,6 +219,7 @@ class FunctionCard extends StatefulWidget {
     required this.count,
     required this.lable,
     required this.exactCount,
+    required this.totalCrates, // Add totalCrates parameter
   }) : super(key: key);
 
   @override
@@ -224,6 +260,10 @@ class _FunctionCardState extends State<FunctionCard>
 
   @override
   Widget build(BuildContext context) {
+    int count = int.tryParse(widget.count) ?? 0;
+    double percentage =
+        widget.totalCrates > 0 ? (count / widget.totalCrates) * 100 : 0;
+
     return GestureDetector(
       onTapDown: _onTapDown,
       onTapUp: _onTapUp,
@@ -275,6 +315,22 @@ class _FunctionCardState extends State<FunctionCard>
                         Text(
                           widget.description,
                           style: TextStyle(color: Colors.grey.shade700),
+                        ),
+                        const SizedBox(height: 10),
+                        // Animated Percentage Display
+                        TweenAnimationBuilder<double>(
+                          tween: Tween<double>(begin: 0, end: percentage),
+                          duration: Duration(seconds: 2),
+                          builder: (context, value, child) {
+                            return Text(
+                              '${value.toStringAsFixed(2)}% of Total Crates',
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.orange,
+                              ),
+                            );
+                          },
                         ),
                         const SizedBox(height: 10),
                         Row(
