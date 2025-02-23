@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:provider/provider.dart';
+import 'dart:async';
 
 class FunctionsWidget extends StatefulWidget {
   const FunctionsWidget({Key? key}) : super(key: key);
@@ -26,6 +27,8 @@ class _FunctionsWidgetState extends State<FunctionsWidget> {
   String initialUnloadingCount = '0';
   String initialCollectingCount = '0';
   String initialReceivingCount = '0';
+
+  Timer? _refreshTimer;
 
   Future<void> searchTruck() async {
     String truckNo = _truckNoController.text.trim();
@@ -100,6 +103,23 @@ class _FunctionsWidgetState extends State<FunctionsWidget> {
     super.initState();
     final userProvider = Provider.of<UserProvider>(context, listen: false);
     fetchInitialData(userProvider.subLocationId);
+    _startAutoRefresh();
+  }
+
+  @override
+  void dispose() {
+    _refreshTimer?.cancel(); // Cancel the timer
+    super.dispose();
+  }
+
+  void _startAutoRefresh() {
+    _refreshTimer = Timer.periodic(Duration(seconds: 5), (Timer timer) {
+      final userProvider = Provider.of<UserProvider>(context, listen: false);
+      fetchInitialData(
+        userProvider.subLocationId,
+      ); // Refresh warehouse crate count
+      searchTruck(); // Refresh truck-specific data
+    });
   }
 
   @override
