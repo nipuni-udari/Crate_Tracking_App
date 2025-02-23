@@ -15,29 +15,16 @@ class ProfileScreen extends StatelessWidget {
 
     return Scaffold(
       body: Container(
-        decoration: BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage(
-              'assets/background.png',
-            ), // Replace with your image path
-            fit: BoxFit.none, // Ensures the image doesn't stretch
-            repeat: ImageRepeat.repeat, // Repeats the image
-          ),
+        decoration: const BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              const Color.fromARGB(
-                255,
-                249,
-                139,
-                71,
-              ).withOpacity(0.9), // Adjust opacity
-              const Color.fromARGB(255, 255, 230, 9).withOpacity(0.9),
+              Color.fromARGB(255, 249, 139, 71),
+              Color.fromARGB(255, 255, 230, 9),
             ],
           ),
         ),
-
         child: SafeArea(
           child: Column(
             children: [
