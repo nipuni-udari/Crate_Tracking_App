@@ -15,16 +15,29 @@ class ProfileScreen extends StatelessWidget {
 
     return Scaffold(
       body: Container(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage(
+              'assets/background.png',
+            ), // Replace with your image path
+            fit: BoxFit.none, // Ensures the image doesn't stretch
+            repeat: ImageRepeat.repeat, // Repeats the image
+          ),
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              Color.fromARGB(255, 249, 139, 71),
-              Color.fromARGB(255, 255, 230, 9),
+              const Color.fromARGB(
+                255,
+                249,
+                139,
+                71,
+              ).withOpacity(0.9), // Adjust opacity
+              const Color.fromARGB(255, 255, 230, 9).withOpacity(0.9),
             ],
           ),
         ),
+
         child: SafeArea(
           child: Column(
             children: [
@@ -71,13 +84,20 @@ class ProfileScreen extends StatelessWidget {
               Expanded(
                 child: Container(
                   padding: const EdgeInsets.all(16.0),
-                  decoration: const BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.only(
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.9), // Adjust transparency
+                    image: const DecorationImage(
+                      image: AssetImage(
+                        "assets/images/background_pattern.jpg",
+                      ), // Update with your image path
+                      repeat: ImageRepeat.repeat, // Repeats the image
+                      opacity: 0.2, // Adjust the opacity of the image
+                    ),
+                    borderRadius: const BorderRadius.only(
                       topLeft: Radius.circular(30),
                       topRight: Radius.circular(30),
                     ),
-                    boxShadow: [
+                    boxShadow: const [
                       BoxShadow(
                         color: Colors.black26,
                         blurRadius: 5,
@@ -122,7 +142,6 @@ class ProfileScreen extends StatelessWidget {
                         width: 200,
                         child: ElevatedButton(
                           onPressed: () {
-                            // Perform any necessary logout logic here (e.g., clearing user session)
                             Navigator.pushReplacement(
                               context,
                               MaterialPageRoute(
