@@ -332,40 +332,43 @@ class _FunctionCardState extends State<FunctionCard>
                           style: TextStyle(color: Colors.grey.shade700),
                         ),
                         const SizedBox(height: 10),
-                        TweenAnimationBuilder<double>(
-                          tween: Tween<double>(begin: 0, end: percentage),
-                          duration: const Duration(seconds: 2),
-                          builder: (context, value, child) {
-                            return Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                SizedBox(
-                                  width: 500,
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(10),
-                                    child: LinearProgressIndicator(
-                                      value: value,
-                                      backgroundColor: Colors.grey[300],
-                                      valueColor: AlwaysStoppedAnimation<Color>(
-                                        Colors.orange,
+                        // Conditionally render the percentage bar and text
+                        if (count > 0)
+                          TweenAnimationBuilder<double>(
+                            tween: Tween<double>(begin: 0, end: percentage),
+                            duration: const Duration(seconds: 2),
+                            builder: (context, value, child) {
+                              return Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  SizedBox(
+                                    width: 500,
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(10),
+                                      child: LinearProgressIndicator(
+                                        value: value,
+                                        backgroundColor: Colors.grey[300],
+                                        valueColor:
+                                            AlwaysStoppedAnimation<Color>(
+                                              Colors.orange,
+                                            ),
+                                        minHeight: 20,
                                       ),
-                                      minHeight: 20,
                                     ),
                                   ),
-                                ),
-                                const SizedBox(height: 5),
-                                Text(
-                                  '${(value * 100).toStringAsFixed(2)}% of Total Crates',
-                                  style: const TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.orange,
+                                  const SizedBox(height: 5),
+                                  Text(
+                                    '${(value * 100).toStringAsFixed(2)}% of Total Crates',
+                                    style: const TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.orange,
+                                    ),
                                   ),
-                                ),
-                              ],
-                            );
-                          },
-                        ),
+                                ],
+                              );
+                            },
+                          ),
                         const SizedBox(height: 10),
                         Row(
                           children: [
