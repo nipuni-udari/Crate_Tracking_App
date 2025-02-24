@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter_searchable_dropdown/flutter_searchable_dropdown.dart';
 import 'package:http/http.dart' as http;
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -243,26 +244,33 @@ class _LoadingTabState extends State<LoadingTab> {
                 ),
               ],
             ),
-            child: DropdownButton<String>(
-              value: selectedLorry,
-              hint: const Text('Select Truck'),
-              icon: const Icon(
-                Icons.arrow_drop_down,
-                color: Color.fromARGB(255, 249, 139, 71),
-              ),
-              style: const TextStyle(color: Colors.black, fontSize: 18),
-              underline: const SizedBox(),
+            child: SearchableDropdown<String>(
               items:
-                  lorryNumbers.map((lorry) {
+                  lorryNumbers.map((String lorry) {
                     return DropdownMenuItem<String>(
                       value: lorry,
                       child: Text(lorry, style: const TextStyle(fontSize: 18)),
                     );
                   }).toList(),
+              value: selectedLorry,
+              hint: const Text('Select Truck'),
+              searchHint: const Text('Search for a truck'),
               onChanged: (value) {
                 setState(() {
                   selectedLorry = value;
                 });
+              },
+              isExpanded: true,
+              underline: const SizedBox(),
+              icon: const Icon(
+                Icons.arrow_drop_down,
+                color: Color.fromARGB(255, 249, 139, 71),
+              ),
+              iconDisabledColor: Colors.grey,
+              iconEnabledColor: const Color.fromARGB(255, 249, 139, 71),
+              style: const TextStyle(color: Colors.black, fontSize: 18),
+              selectedValueWidgetFn: (item) {
+                return Text(item, style: const TextStyle(fontSize: 18));
               },
             ),
           );
