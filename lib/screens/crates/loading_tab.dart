@@ -138,11 +138,18 @@ class _LoadingTabState extends State<LoadingTab> {
       );
 
       final responseData = json.decode(response.body);
+
       setState(() {
-        if (response.statusCode == 200 && responseData["status"] == "success") {
-          serverResponse = "Crate $serialNumber saved successfully!";
+        if (response.statusCode == 200) {
+          if (responseData["status"] == "success") {
+            serverResponse = "Crate $serialNumber saved successfully!";
+          } else if (responseData["status"] == "duplicate") {
+            serverResponse = "You have already scanned this crate.";
+          } else {
+            serverResponse = "Failed to save crate: ${responseData["message"]}";
+          }
         } else {
-          serverResponse = "Failed to save crate: ${responseData["message"]}";
+          serverResponse = "Server error: ${response.statusCode}";
         }
       });
     } catch (e) {

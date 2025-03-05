@@ -7,6 +7,7 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:crate_tracking/user_provider.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:flutter_searchable_dropdown/flutter_searchable_dropdown.dart';
 
 class ReceivingTab extends StatefulWidget {
   const ReceivingTab({Key? key}) : super(key: key);
@@ -298,26 +299,33 @@ class _ReceivingTabState extends State<ReceivingTab> {
                 ),
               ],
             ),
-            child: DropdownButton<String>(
-              value: selectedLorry,
-              hint: const Text('Select Lorry'),
-              icon: const Icon(
-                Icons.arrow_drop_down,
-                color: Color.fromARGB(255, 249, 139, 71),
-              ),
-              style: const TextStyle(color: Colors.black, fontSize: 18),
-              underline: const SizedBox(),
+            child: SearchableDropdown<String>(
               items:
-                  lorryNumbers.map((lorry) {
+                  lorryNumbers.map((String lorry) {
                     return DropdownMenuItem<String>(
                       value: lorry,
                       child: Text(lorry, style: const TextStyle(fontSize: 18)),
                     );
                   }).toList(),
+              value: selectedLorry,
+              hint: const Text('Select Truck'),
+              searchHint: const Text('Search for a truck'),
               onChanged: (value) {
                 setState(() {
                   selectedLorry = value;
                 });
+              },
+              isExpanded: true,
+              underline: const SizedBox(),
+              icon: const Icon(
+                Icons.arrow_drop_down,
+                color: Color.fromARGB(255, 249, 139, 71),
+              ),
+              iconDisabledColor: Colors.grey,
+              iconEnabledColor: const Color.fromARGB(255, 249, 139, 71),
+              style: const TextStyle(color: Colors.black, fontSize: 18),
+              selectedValueWidgetFn: (item) {
+                return Text(item, style: const TextStyle(fontSize: 18));
               },
             ),
           );
