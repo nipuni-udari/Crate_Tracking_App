@@ -29,6 +29,7 @@ class _FunctionsWidgetState extends State<FunctionsWidget> {
   String initialReceivingCount = '0';
 
   Timer? _refreshTimer;
+  bool _isErrorDisplayed = false; // Flag to track if error is displayed
 
   Future<void> searchTruck() async {
     String truckNo = _truckNoController.text.trim();
@@ -52,17 +53,44 @@ class _FunctionsWidgetState extends State<FunctionsWidget> {
 
     if (response.statusCode == 200) {
       var data = json.decode(response.body);
-      print("Response Data: $data"); // Debugging: Print the response data
-      setState(() {
-        loadingCount = data['loading']?.toString() ?? '0';
-        unloadingCount = data['unloading']?.toString() ?? '0';
-        collectingCount = data['collecting']?.toString() ?? '0';
-        receivingCount = data['receiving']?.toString() ?? '0';
-        exactCratesCount = data['exact_crates_count']?.toString() ?? '0';
-        systemCratesCount = data['system_crates_count']?.toString() ?? '0';
-      });
+      if (data.containsKey('error')) {
+        // Show error message only if it hasn't been displayed before
+        if (!_isErrorDisplayed) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(data['error']), backgroundColor: Colors.red),
+          );
+          setState(() {
+            _isErrorDisplayed = true; // Mark error as displayed
+          });
+        }
+
+        // Reset to initial data when truck is not found
+        final userProvider = Provider.of<UserProvider>(context, listen: false);
+        fetchInitialData(userProvider.subLocationId);
+      } else {
+        // Reset the error flag if a valid truck is found
+        setState(() {
+          _isErrorDisplayed = false;
+        });
+
+        print("Response Data: $data"); // Debugging: Print the response data
+        setState(() {
+          loadingCount = data['loading']?.toString() ?? '0';
+          unloadingCount = data['unloading']?.toString() ?? '0';
+          collectingCount = data['collecting']?.toString() ?? '0';
+          receivingCount = data['receiving']?.toString() ?? '0';
+          exactCratesCount = data['exact_crates_count']?.toString() ?? '0';
+          systemCratesCount = data['system_crates_count']?.toString() ?? '0';
+        });
+      }
     } else {
       print("Failed to fetch data");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Failed to fetch data'),
+          backgroundColor: Colors.red,
+        ),
+      );
     }
   }
 
@@ -155,7 +183,7 @@ class _FunctionsWidgetState extends State<FunctionsWidget> {
                 child: TextField(
                   controller: _truckNoController,
                   style: const TextStyle(color: Colors.orange),
-                  keyboardType: TextInputType.number,
+                  // keyboardType: TextInputType.number,
                   decoration: InputDecoration(
                     filled: true,
                     fillColor: Colors.white,
