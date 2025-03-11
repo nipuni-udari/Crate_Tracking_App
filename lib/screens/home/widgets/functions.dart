@@ -312,7 +312,7 @@ class _FunctionCardState extends State<FunctionCard>
 
     return Center(
       child: Container(
-        width: screenWidth * 0.9, // 80% of screen width
+        width: screenWidth * 0.9, // 90% of screen width
         child: GestureDetector(
           onTap: _onTap,
           child: ScaleTransition(
@@ -332,6 +332,9 @@ class _FunctionCardState extends State<FunctionCard>
                 ],
               ),
               child: Row(
+                mainAxisAlignment:
+                    MainAxisAlignment
+                        .spaceBetween, // Aligns content to left and image to right
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Left content section
@@ -381,7 +384,9 @@ class _FunctionCardState extends State<FunctionCard>
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Container(
-                                    width: double.infinity, // Take full width
+                                    width:
+                                        screenWidth *
+                                        0.5, // Constrain width to 50% of screen width
                                     height: 20,
                                     decoration: BoxDecoration(
                                       borderRadius: BorderRadius.circular(10),
@@ -448,17 +453,13 @@ class _FunctionCardState extends State<FunctionCard>
                   ),
 
                   // Right image section
-                  SizedBox(width: 10), // Spacing between content and image
-                  Flexible(
-                    flex: 1,
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(12),
-                      child: Image.asset(
-                        widget.imagePath,
-                        width: double.infinity,
-                        height: screenWidth * 0.25, // 25% of screen width
-                        fit: BoxFit.cover,
-                      ),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child: Image.asset(
+                      widget.imagePath,
+                      width: screenWidth * 0.10, // 25% of screen width
+                      height: screenWidth * 0.10, // 25% of screen width
+                      fit: BoxFit.cover,
                     ),
                   ),
                 ],
