@@ -115,11 +115,13 @@ class _FunctionsWidgetState extends State<FunctionsWidget> {
         initialReceivingCount =
             data['vehicle_status'][0]['total_receiving']?.toString() ?? '0';
 
-        // Set initial counts to the current counts
-        loadingCount = initialLoadingCount;
-        unloadingCount = initialUnloadingCount;
-        collectingCount = initialCollectingCount;
-        receivingCount = initialReceivingCount;
+        // Only set initial counts if no truck is being searched
+        if (_truckNoController.text.trim().isEmpty) {
+          loadingCount = initialLoadingCount;
+          unloadingCount = initialUnloadingCount;
+          collectingCount = initialCollectingCount;
+          receivingCount = initialReceivingCount;
+        }
       });
     } else {
       print("Failed to fetch initial data");
@@ -145,8 +147,7 @@ class _FunctionsWidgetState extends State<FunctionsWidget> {
       final userProvider = Provider.of<UserProvider>(context, listen: false);
       fetchInitialData(
         userProvider.subLocationId,
-      ); // Refresh warehouse crate count
-      searchTruck(); // Refresh truck-specific data
+      ); // Only refresh warehouse crate count
     });
   }
 
@@ -183,7 +184,6 @@ class _FunctionsWidgetState extends State<FunctionsWidget> {
                 child: TextField(
                   controller: _truckNoController,
                   style: const TextStyle(color: Colors.orange),
-                  // keyboardType: TextInputType.number,
                   decoration: InputDecoration(
                     filled: true,
                     fillColor: Colors.white,
@@ -229,7 +229,7 @@ class _FunctionsWidgetState extends State<FunctionsWidget> {
         FunctionCard(
           title: "Collecting",
           description: "Collecting crates from the customer",
-          imagePath: "assets/images/collect.webp",
+          imagePath: "assets/images/collecting.png",
           count: collectingCount,
           lable: 'Crate count',
           exactCount: exactCratesCount,
@@ -239,7 +239,7 @@ class _FunctionsWidgetState extends State<FunctionsWidget> {
         FunctionCard(
           title: "Receiving",
           description: "Hand over crates to the warehouse",
-          imagePath: "assets/images/receiving.jpg",
+          imagePath: "assets/images/receiving.png",
           count: receivingCount,
           lable: 'Crate count',
           exactCount: exactCratesCount,

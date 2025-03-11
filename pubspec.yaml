@@ -96,8 +96,8 @@ flutter:
     - assets/images/background_pattern.jpg
     - assets/images/unloading.webp
     - assets/images/loading.png
-    - assets/images/receiving.jpg
-    - assets/images/collect.webp
+    - assets/images/receiving.png
+    - assets/images/collecting.png
     - assets/images/receive.avif
 
 flutter_icons:
