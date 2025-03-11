@@ -54,7 +54,7 @@ class _FunctionsWidgetState extends State<FunctionsWidget> {
     if (response.statusCode == 200) {
       var data = json.decode(response.body);
       if (data.containsKey('error')) {
-        // Show error message only if it hasn't been displayed before
+        // Show error message only if it hasn't been displayed before.
         if (!_isErrorDisplayed) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text(data['error']), backgroundColor: Colors.red),
@@ -308,26 +308,37 @@ class _FunctionCardState extends State<FunctionCard>
     double percentage =
         widget.totalCrates > 0 ? (count / widget.totalCrates) : 0;
 
-    return GestureDetector(
-      onTap: _onTap,
-      child: ScaleTransition(
-        scale: _animation,
-        child: SizedBox(
-          width: MediaQuery.of(context).size.width * 0.9,
-          child: Card(
-            color: Colors.white,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(15),
-            ),
-            elevation: 5,
-            child: Padding(
-              padding: const EdgeInsets.all(12.0),
+    double screenWidth = MediaQuery.of(context).size.width;
+
+    return Center(
+      child: Container(
+        width: screenWidth * 0.9, // 80% of screen width
+        child: GestureDetector(
+          onTap: _onTap,
+          child: ScaleTransition(
+            scale: _animation,
+            child: Container(
+              margin: const EdgeInsets.symmetric(vertical: 8),
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(15),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.1),
+                    blurRadius: 8,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
               child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  // Left content section
                   Expanded(
+                    flex: 2,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
                       children: [
                         Row(
                           children: [
@@ -360,7 +371,7 @@ class _FunctionCardState extends State<FunctionCard>
                           style: TextStyle(color: Colors.grey.shade700),
                         ),
                         const SizedBox(height: 10),
-                        // Conditionally render the percentage bar and text
+
                         if (count > 0)
                           TweenAnimationBuilder<double>(
                             tween: Tween<double>(begin: 0, end: percentage),
@@ -369,18 +380,22 @@ class _FunctionCardState extends State<FunctionCard>
                               return Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  SizedBox(
-                                    width: 500,
+                                  Container(
+                                    width: double.infinity, // Take full width
+                                    height: 20,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(10),
+                                      color: Colors.grey[300],
+                                    ),
                                     child: ClipRRect(
                                       borderRadius: BorderRadius.circular(10),
                                       child: LinearProgressIndicator(
                                         value: value,
-                                        backgroundColor: Colors.grey[300],
+                                        backgroundColor: Colors.transparent,
                                         valueColor:
                                             AlwaysStoppedAnimation<Color>(
                                               Colors.orange,
                                             ),
-                                        minHeight: 20,
                                       ),
                                     ),
                                   ),
@@ -398,14 +413,17 @@ class _FunctionCardState extends State<FunctionCard>
                             },
                           ),
                         const SizedBox(height: 10),
+
                         Row(
                           children: [
-                            Text(
-                              "Exact crates count: ${widget.exactCount}",
-                              style: const TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.orange,
+                            Flexible(
+                              child: Text(
+                                "Exact crates count: ${widget.exactCount}",
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.orange,
+                                ),
                               ),
                             ),
                             const SizedBox(width: 10),
@@ -428,13 +446,19 @@ class _FunctionCardState extends State<FunctionCard>
                       ],
                     ),
                   ),
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(12),
-                    child: Image.asset(
-                      widget.imagePath,
-                      width: 200,
-                      height: 100,
-                      fit: BoxFit.cover,
+
+                  // Right image section
+                  SizedBox(width: 10), // Spacing between content and image
+                  Flexible(
+                    flex: 1,
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: Image.asset(
+                        widget.imagePath,
+                        width: double.infinity,
+                        height: screenWidth * 0.25, // 25% of screen width
+                        fit: BoxFit.cover,
+                      ),
                     ),
                   ),
                 ],
@@ -488,6 +512,8 @@ class _SpecialOfferBannerState extends State<SpecialOfferBanner>
 
   @override
   Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
+
     return FadeTransition(
       opacity: _animation,
       child: Padding(
@@ -511,139 +537,130 @@ class _SpecialOfferBannerState extends State<SpecialOfferBanner>
               ),
             ],
           ),
-          padding: const EdgeInsets.all(20.0),
-          child: Row(
-            children: [
-              // Left side: Image and text
-              Expanded(
-                child: Row(
-                  children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(12),
-                      child: Image.asset(
-                        'assets/images/crate_image.png',
-                        width: 100,
-                        height: 100,
-                        fit: BoxFit.cover,
+          padding: const EdgeInsets.all(16.0),
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              bool isSmallScreen = constraints.maxWidth < 400;
+
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Left side: Image and text
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(12),
+                        child: Image.asset(
+                          'assets/images/crate_image.png',
+                          width: isSmallScreen ? 60 : 100,
+                          height: isSmallScreen ? 60 : 100,
+                          fit: BoxFit.cover,
+                        ),
                       ),
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                      const SizedBox(width: 12),
+                      // Description & Animated Counter
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Track Crates Like a Pro!',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: isSmallScreen ? 16 : 20,
+                                fontWeight: FontWeight.bold,
+                                height: 1.2,
+                              ),
+                            ),
+                            const SizedBox(height: 6),
+                            Text(
+                              'Never lose a crate again! Our app provides real-time tracking, analytics, and more.',
+                              style: TextStyle(
+                                color: Colors.white.withOpacity(0.9),
+                                fontSize: isSmallScreen ? 12 : 14,
+                                height: 1.4,
+                              ),
+                            ),
+                            const SizedBox(height: 12),
+                            TweenAnimationBuilder(
+                              tween: IntTween(
+                                begin: 0,
+                                end: int.parse(widget.totalCrates),
+                              ),
+                              duration: Duration(seconds: 2),
+                              builder: (context, int value, child) {
+                                return Text(
+                                  '$value',
+                                  style: TextStyle(
+                                    fontSize: isSmallScreen ? 28 : 36,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.yellowAccent,
+                                  ),
+                                );
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  // Buttons - Stack vertically on small screens
+                  isSmallScreen
+                      ? Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          Text(
-                            'Track Crates Like a Pro!',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                              shadows: [
-                                Shadow(
-                                  color: Colors.black.withOpacity(0.3),
-                                  blurRadius: 2,
-                                  offset: Offset(1, 1),
-                                ),
-                              ],
+                          _buildButton(
+                            'Exact crate Count: ${widget.exactCratesCount}',
+                          ),
+                          const SizedBox(height: 10),
+                          _buildButton(
+                            'System crate Count: ${widget.systemCratesCount}',
+                          ),
+                        ],
+                      )
+                      : Row(
+                        children: [
+                          Expanded(
+                            child: _buildButton(
+                              'Exact crate Count: ${widget.exactCratesCount}',
                             ),
                           ),
-                          const SizedBox(height: 8),
-                          Text(
-                            'Never lose a crate again! '
-                            'Our app provides real-time tracking, analytics, and more. ',
-                            style: TextStyle(
-                              color: Colors.white.withOpacity(0.9),
-                              fontSize: 14,
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: _buildButton(
+                              'System crate Count: ${widget.systemCratesCount}',
                             ),
-                          ),
-                          const SizedBox(height: 12),
-                          // Animated Number
-                          TweenAnimationBuilder(
-                            tween: IntTween(
-                              begin: 0,
-                              end: int.parse(widget.totalCrates),
-                            ),
-                            duration: Duration(seconds: 2),
-                            builder: (context, int value, child) {
-                              return Text(
-                                '$value',
-                                style: TextStyle(
-                                  fontSize: 36,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.yellowAccent,
-                                  shadows: [
-                                    Shadow(
-                                      color: Colors.black.withOpacity(0.5),
-                                      blurRadius: 5,
-                                      offset: Offset(2, 2),
-                                    ),
-                                  ],
-                                ),
-                              );
-                            },
                           ),
                         ],
                       ),
-                    ),
-                  ],
-                ),
-              ),
-              // Right side: Buttons stacked vertically
-              Column(
-                children: [
-                  // Exact Crate Count Button
-                  ElevatedButton(
-                    onPressed: () {
-                      // Add your action here
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 20,
-                        vertical: 10,
-                      ),
-                    ),
-                    child: Text(
-                      'Exact crate Count: ${widget.exactCratesCount}',
-                      style: TextStyle(
-                        color: Color.fromARGB(255, 252, 37, 37),
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 10), // Space between buttons
-                  // System Crate Count Button
-                  ElevatedButton(
-                    onPressed: () {
-                      // Add your action here
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 20,
-                        vertical: 10,
-                      ),
-                    ),
-                    child: Text(
-                      'System crate Count: ${widget.systemCratesCount}',
-                      style: TextStyle(
-                        color: Color.fromARGB(255, 252, 37, 37),
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
                 ],
-              ),
-            ],
+              );
+            },
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildButton(String text) {
+    return ElevatedButton(
+      onPressed: () {
+        // Add your action here
+      },
+      style: ElevatedButton.styleFrom(
+        backgroundColor: Colors.white,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+      ),
+      child: Text(
+        text,
+        textAlign: TextAlign.center,
+        style: TextStyle(
+          color: Color.fromARGB(255, 252, 37, 37),
+          fontSize: 14,
+          fontWeight: FontWeight.bold,
         ),
       ),
     );
