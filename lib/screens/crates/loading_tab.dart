@@ -170,48 +170,44 @@ class _LoadingTabState extends State<LoadingTab> {
   }
 
   Widget _buildTotalScannedCratesCard() {
-    return Positioned(
-      left: 16, // Position the card on the right side of the screen
-      top: 150, // Adjust the top position as needed
-      child: Card(
-        elevation: 5,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-        child: Container(
-          width: 300,
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                const Color.fromARGB(255, 249, 139, 71),
-                const Color.fromARGB(255, 255, 183, 77),
-              ],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-            borderRadius: BorderRadius.circular(15),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                'Total Scanned Crates',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
-              ),
-              const SizedBox(height: 10),
-              Text(
-                totalScannedCrates.toString(),
-                style: const TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
-              ),
+    return Card(
+      elevation: 5,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      child: Container(
+        width: 200, // Fixed width
+        padding: const EdgeInsets.all(12), // Reduced padding
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              const Color.fromARGB(255, 249, 139, 71),
+              const Color.fromARGB(255, 255, 183, 77),
             ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
           ),
+          borderRadius: BorderRadius.circular(15),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Total Scanned Crates',
+              style: TextStyle(
+                fontSize: 14, // Reduced font size
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              totalScannedCrates.toString(),
+              style: const TextStyle(
+                fontSize: 18, // Reduced font size
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -287,72 +283,62 @@ class _LoadingTabState extends State<LoadingTab> {
   }
 
   Widget _buildLocationDetailsCard(UserProvider userProvider) {
-    return Positioned(
-      left: 16, // Position the card on the right side of the screen
-      top: 16, // Adjust the top position as needed
-      child: Card(
-        elevation: 5,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-        child: Container(
-          width: 300,
-
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                const Color.fromARGB(255, 249, 139, 71),
-                const Color.fromARGB(255, 255, 183, 77),
-              ],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-            borderRadius: BorderRadius.circular(15),
+    return Card(
+      elevation: 5,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      child: Container(
+        width: 200, // Fixed width
+        padding: const EdgeInsets.all(12), // Reduced padding
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              const Color.fromARGB(255, 249, 139, 71),
+              const Color.fromARGB(255, 255, 183, 77),
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
           ),
-          child: Row(
-            children: [
-              // Details (Sub Location and Division)
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    if (userProvider.subLocationName.isNotEmpty)
-                      Text(
+          borderRadius: BorderRadius.circular(15),
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  if (userProvider.subLocationName.isNotEmpty)
+                    Flexible(
+                      child: Text(
                         'Sub Location: ${userProvider.subLocationName}',
                         style: const TextStyle(
-                          fontSize: 14,
+                          fontSize: 12, // Reduced font size
                           fontWeight: FontWeight.bold,
                           color: Colors.white,
                         ),
+                        overflow: TextOverflow.ellipsis, // Handle overflow
                       ),
-                    if (userProvider.divisionsName.isNotEmpty)
-                      Padding(
+                    ),
+                  if (userProvider.divisionsName.isNotEmpty)
+                    Flexible(
+                      child: Padding(
                         padding: const EdgeInsets.only(top: 8.0),
                         child: Text(
                           'Division: ${userProvider.divisionsName}',
-
                           style: const TextStyle(
-                            fontSize: 14,
+                            fontSize: 12, // Reduced font size
                             fontWeight: FontWeight.bold,
                             color: Colors.white,
                           ),
+                          overflow: TextOverflow.ellipsis, // Handle overflow
                         ),
                       ),
-                  ],
-                ),
+                    ),
+                ],
               ),
-              // Image on the right side
-              const SizedBox(width: 10),
-              ClipRRect(
-                borderRadius: BorderRadius.circular(10),
-                child: Image.asset(
-                  'assets/images/crate_image.png', // Add your image to assets
-                  width: 60,
-                  height: 60,
-                  fit: BoxFit.cover,
-                ),
-              ),
-            ],
-          ),
+            ),
+            const SizedBox(width: 10),
+          ],
         ),
       ),
     );
@@ -362,40 +348,42 @@ class _LoadingTabState extends State<LoadingTab> {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        // Camera Logo with Orange Color
         Icon(
           Icons.camera_alt,
-          size: 100,
-          color: const Color.fromARGB(255, 249, 139, 71), // Orange color
+          size: 60, // Reduced size
+          color: const Color.fromARGB(255, 249, 139, 71),
         ),
-        const SizedBox(height: 20),
-        // Title
+        const SizedBox(height: 10),
         const Text(
           "Scan the QR Code",
           style: TextStyle(
-            fontSize: 24,
+            fontSize: 18, // Reduced font size
             fontWeight: FontWeight.bold,
             color: Colors.black,
           ),
         ),
-        const SizedBox(height: 10),
-        // Subtitle
+        const SizedBox(height: 5),
         const Text(
           "Please scan the crate details",
-          style: TextStyle(fontSize: 16, color: Colors.grey),
+          style: TextStyle(
+            fontSize: 12,
+            color: Colors.grey,
+          ), // Reduced font size
         ),
-        const SizedBox(height: 30),
-        // Start Scan Button
+        const SizedBox(height: 20),
         ElevatedButton(
           onPressed: selectedLorry != null ? _startScan : null,
           style: ElevatedButton.styleFrom(
             backgroundColor:
                 selectedLorry != null
-                    ? const Color.fromARGB(255, 249, 139, 71) // Orange color
+                    ? const Color.fromARGB(255, 249, 139, 71)
                     : Colors.grey,
-            foregroundColor: Colors.white, // Ensures text color is white
-            padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
-            textStyle: const TextStyle(fontSize: 18),
+            foregroundColor: Colors.white,
+            padding: const EdgeInsets.symmetric(
+              horizontal: 30,
+              vertical: 10,
+            ), // Reduced padding
+            textStyle: const TextStyle(fontSize: 14), // Reduced font size
           ),
           child: const Text("Start Scan"),
         ),
@@ -407,14 +395,53 @@ class _LoadingTabState extends State<LoadingTab> {
     return Container(
       decoration: BoxDecoration(
         image: DecorationImage(
-          image: const AssetImage(
-            'assets/images/background_pattern.jpg',
-          ), // Add your image to assets
+          image: const AssetImage('assets/images/background_pattern.jpg'),
           fit: BoxFit.cover,
           colorFilter: ColorFilter.mode(
-            Colors.white.withOpacity(0.9), // Fade effect
+            Colors.white.withOpacity(0.9),
             BlendMode.lighten,
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSelectedDetailsCard() {
+    return Card(
+      elevation: 5,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      child: Container(
+        width: 200, // Fixed width
+        padding: const EdgeInsets.all(12), // Reduced padding
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              const Color.fromARGB(255, 249, 139, 71),
+              const Color.fromARGB(255, 255, 183, 77),
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(15),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment:
+              MainAxisAlignment.center, // Center content vertically
+          children: [
+            if (selectedLorry != null)
+              Flexible(
+                child: Text(
+                  'Truck: $selectedLorry',
+                  style: const TextStyle(
+                    fontSize: 12, // Reduced font size
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                  overflow: TextOverflow.ellipsis, // Handle overflow
+                ),
+              ),
+          ],
         ),
       ),
     );
@@ -450,7 +477,7 @@ class _LoadingTabState extends State<LoadingTab> {
                 padding: const EdgeInsets.all(8.0),
                 child: Text(
                   "Scanned Crates: ${scannedCrates.length}",
-                  style: const TextStyle(fontSize: 16),
+                  style: const TextStyle(fontSize: 14), // Reduced font size
                 ),
               ),
               if (serverResponse.isNotEmpty)
@@ -459,7 +486,7 @@ class _LoadingTabState extends State<LoadingTab> {
                   child: Text(
                     serverResponse,
                     style: TextStyle(
-                      fontSize: 16,
+                      fontSize: 14, // Reduced font size
                       fontWeight: FontWeight.bold,
                       color:
                           serverResponse.contains("successfully")
@@ -472,8 +499,14 @@ class _LoadingTabState extends State<LoadingTab> {
                 child: ListView.builder(
                   itemCount: scannedCrates.length,
                   itemBuilder:
-                      (context, index) =>
-                          ListTile(title: Text(scannedCrates[index])),
+                      (context, index) => ListTile(
+                        title: Text(
+                          scannedCrates[index],
+                          style: const TextStyle(
+                            fontSize: 12,
+                          ), // Reduced font size
+                        ),
+                      ),
                 ),
               ),
               Padding(
@@ -484,32 +517,33 @@ class _LoadingTabState extends State<LoadingTab> {
                     ElevatedButton(
                       onPressed: _doneScanning,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color.fromARGB(
-                          255,
-                          5,
-                          168,
-                          29,
-                        ), // Orange color
-                        foregroundColor: Colors.white, // White text
+                        backgroundColor: const Color.fromARGB(255, 5, 168, 29),
+                        foregroundColor: Colors.white,
                         padding: const EdgeInsets.symmetric(
-                          horizontal: 30,
-                          vertical: 15,
+                          horizontal: 20, // Reduced padding
+                          vertical: 10, // Reduced padding
                         ),
                       ),
-                      child: const Text("Done Scanning"),
+                      child: const Text(
+                        "Done Scanning",
+                        style: TextStyle(fontSize: 12), // Reduced font size
+                      ),
                     ),
-                    const SizedBox(width: 20), // Space between buttons
+                    const SizedBox(width: 10),
                     ElevatedButton(
                       onPressed: _resetPage,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.red, // Red color for exit
-                        foregroundColor: Colors.white, // White text
+                        backgroundColor: Colors.red,
+                        foregroundColor: Colors.white,
                         padding: const EdgeInsets.symmetric(
-                          horizontal: 30,
-                          vertical: 15,
+                          horizontal: 20, // Reduced padding
+                          vertical: 10, // Reduced padding
                         ),
                       ),
-                      child: const Text("Exit"),
+                      child: const Text(
+                        "Exit",
+                        style: TextStyle(fontSize: 12), // Reduced font size
+                      ),
                     ),
                   ],
                 ),
@@ -528,36 +562,41 @@ class _LoadingTabState extends State<LoadingTab> {
     return Scaffold(
       body: Stack(
         children: [
-          // Background Image with Fade Effect
           _buildBackgroundImage(),
-          // Location Details Card
-          _buildLocationDetailsCard(userProvider),
-          // Total Scanned Crates Card (displayed after scanning)
-          if (totalScannedCrates > 0) _buildTotalScannedCratesCard(),
-          Center(
-            child:
-                isScanning
-                    ? _buildScanner()
-                    : Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
+          Column(
+            children: [
+              // Display cards only when not scanning
+              if (!isScanning)
+                SizedBox(
+                  height: 120, // Fixed height for the cards
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
                       children: [
-                        _buildLorrySelection(userProvider),
-                        if (selectedLorry != null)
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Text(
-                              'Selected Truck: $selectedLorry',
-                              style: const TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                                color: Color.fromARGB(255, 249, 139, 71),
-                              ),
-                            ),
-                          ),
-                        const SizedBox(height: 20),
-                        _buildStartScanButton(),
+                        _buildLocationDetailsCard(userProvider),
+                        if (totalScannedCrates > 0)
+                          _buildTotalScannedCratesCard(),
+                        if (selectedLorry != null) _buildSelectedDetailsCard(),
                       ],
                     ),
+                  ),
+                ),
+              Expanded(
+                child: Center(
+                  child:
+                      isScanning
+                          ? _buildScanner()
+                          : Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              _buildLorrySelection(userProvider),
+                              const SizedBox(height: 20),
+                              _buildStartScanButton(),
+                            ],
+                          ),
+                ),
+              ),
+            ],
           ),
         ],
       ),

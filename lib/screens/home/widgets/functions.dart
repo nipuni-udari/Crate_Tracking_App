@@ -457,8 +457,8 @@ class _FunctionCardState extends State<FunctionCard>
                     borderRadius: BorderRadius.circular(12),
                     child: Image.asset(
                       widget.imagePath,
-                      width: screenWidth * 0.10, // 25% of screen width
-                      height: screenWidth * 0.10, // 25% of screen width
+                      width: screenWidth * 0.25, // 25% of screen width
+                      height: screenWidth * 0.25, // 25% of screen width
                       fit: BoxFit.cover,
                     ),
                   ),

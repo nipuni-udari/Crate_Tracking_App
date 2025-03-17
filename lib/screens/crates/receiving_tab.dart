@@ -22,7 +22,8 @@ class _ReceivingTabState extends State<ReceivingTab> {
   String? selectedLorry;
   List<String> lorryNumbers = [];
   String serverResponse = "";
-  int totalScannedCrates = 0; // Add this variable
+  int totalScannedCrates = 0;
+
   Future<List<String>> fetchVehicles(
     String subLocationId,
     String divisionId,
@@ -116,11 +117,10 @@ class _ReceivingTabState extends State<ReceivingTab> {
   void _doneScanning() {
     setState(() {
       isScanning = false;
-      totalScannedCrates = scannedCrates.length; // Store the count
-      scannedCrates.clear(); // Clear the list for the next scan
+      totalScannedCrates = scannedCrates.length;
+      scannedCrates.clear();
     });
 
-    // Send the total crate count to the backend
     _sendTotalCratesToDatabase();
 
     ScaffoldMessenger.of(context).showSnackBar(
@@ -137,29 +137,24 @@ class _ReceivingTabState extends State<ReceivingTab> {
         body: {'serial': serialNumber, 'vehicle_no': selectedLorry!},
       );
 
-      // Check if response is JSON
-      try {
-        final responseData = json.decode(response.body);
-        setState(() {
-          if (response.statusCode == 200 &&
-              responseData["status"] == "success") {
+      final responseData = json.decode(response.body);
+
+      setState(() {
+        if (response.statusCode == 200) {
+          if (responseData["status"] == "success") {
             serverResponse = "Crate $serialNumber saved successfully!";
           } else if (responseData["status"] == "duplicate") {
             serverResponse = "You have already scanned this crate.";
           } else {
-            serverResponse =
-                "Failed to save crate: ${responseData["message"] ?? 'Unknown error'}";
+            serverResponse = "Failed to save crate: ${responseData["message"]}";
           }
-        });
-      } catch (e) {
-        // Handle non-JSON responses
-        setState(() {
-          serverResponse = "Invalid server response: ${response.body}";
-        });
-      }
+        } else {
+          serverResponse = "Server error: ${response.statusCode}";
+        }
+      });
     } catch (e) {
       setState(() {
-        serverResponse = "Network error: ${e.toString()}";
+        serverResponse = "Error: ${e.toString()}";
       });
     }
   }
@@ -175,92 +170,137 @@ class _ReceivingTabState extends State<ReceivingTab> {
   }
 
   Widget _buildTotalScannedCratesCard() {
-    return Positioned(
-      left: 16, // Position the card on the right side of the screen
-      top: 150, // Adjust the top position as needed
-      child: Card(
-        elevation: 5,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-        child: Container(
-          width: 300,
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                const Color.fromARGB(255, 249, 139, 71),
-                const Color.fromARGB(255, 255, 183, 77),
-              ],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-            borderRadius: BorderRadius.circular(15),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                'Total Scanned Crates',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
-              ),
-              const SizedBox(height: 10),
-              Text(
-                totalScannedCrates.toString(),
-                style: const TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
-              ),
+    return Card(
+      elevation: 5,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      child: Container(
+        width: 200,
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              Color.fromARGB(255, 249, 139, 71),
+              Color.fromARGB(255, 255, 183, 77),
             ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
           ),
+          borderRadius: BorderRadius.circular(15),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Total Scanned Crates',
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
+            SizedBox(height: 8),
+            Text(
+              totalScannedCrates.toString(),
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final userProvider = Provider.of<UserProvider>(context);
-
-    return Scaffold(
-      body: Stack(
-        children: [
-          // Background Image with Fade Effect
-          _buildBackgroundImage(),
-          // Location Details Card
-          _buildLocationDetailsCard(userProvider),
-          // Total Scanned Crates Card (displayed after scanning)
-          if (totalScannedCrates > 0) _buildTotalScannedCratesCard(),
-          Center(
-            child:
-                isScanning
-                    ? _buildScanner()
-                    : Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        _buildLorrySelection(userProvider),
-                        if (selectedLorry != null)
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Text(
-                              'Selected Truck: $selectedLorry',
-                              style: const TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                                color: Color.fromARGB(255, 249, 139, 71),
-                              ),
-                            ),
-                          ),
-                        const SizedBox(height: 20),
-                        _buildStartScanButton(),
-                      ],
-                    ),
+  Widget _buildSelectedTruckCard() {
+    return Card(
+      elevation: 5,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      child: Container(
+        width: 200,
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              Color.fromARGB(255, 249, 139, 71),
+              Color.fromARGB(255, 255, 183, 77),
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
           ),
-        ],
+          borderRadius: BorderRadius.circular(15),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Selected Truck',
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
+            SizedBox(height: 8),
+            Text(
+              selectedLorry ?? 'None',
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLocationDetailsCard(UserProvider userProvider) {
+    return Card(
+      elevation: 5,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      child: Container(
+        width: 200,
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              Color.fromARGB(255, 249, 139, 71),
+              Color.fromARGB(255, 255, 183, 77),
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(15),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (userProvider.subLocationName.isNotEmpty)
+              Text(
+                'Sub Location: ${userProvider.subLocationName}',
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+            if (userProvider.divisionsName.isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.only(top: 8.0),
+                child: Text(
+                  'Division: ${userProvider.divisionsName}',
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+          ],
+        ),
       ),
     );
   }
@@ -288,7 +328,7 @@ class _ReceivingTabState extends State<ReceivingTab> {
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(10),
               border: Border.all(
-                color: const Color.fromARGB(255, 249, 139, 71),
+                color: Color.fromARGB(255, 249, 139, 71),
                 width: 2,
               ),
               boxShadow: const [
@@ -322,7 +362,7 @@ class _ReceivingTabState extends State<ReceivingTab> {
                 color: Color.fromARGB(255, 249, 139, 71),
               ),
               iconDisabledColor: Colors.grey,
-              iconEnabledColor: const Color.fromARGB(255, 249, 139, 71),
+              iconEnabledColor: Color.fromARGB(255, 249, 139, 71),
               style: const TextStyle(color: Colors.black, fontSize: 18),
               selectedValueWidgetFn: (item) {
                 return Text(item, style: const TextStyle(fontSize: 18));
@@ -334,115 +374,40 @@ class _ReceivingTabState extends State<ReceivingTab> {
     );
   }
 
-  Widget _buildLocationDetailsCard(UserProvider userProvider) {
-    return Positioned(
-      left: 16, // Position the card on the right side of the screen
-      top: 16, // Adjust the top position as needed
-      child: Card(
-        elevation: 5,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-        child: Container(
-          width: 300,
-
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                const Color.fromARGB(255, 249, 139, 71),
-                const Color.fromARGB(255, 255, 183, 77),
-              ],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-            borderRadius: BorderRadius.circular(15),
-          ),
-          child: Row(
-            children: [
-              // Details (Sub Location and Division)
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    if (userProvider.subLocationName.isNotEmpty)
-                      Text(
-                        'Sub Location: ${userProvider.subLocationName}',
-                        style: const TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
-                    if (userProvider.divisionsName.isNotEmpty)
-                      Padding(
-                        padding: const EdgeInsets.only(top: 8.0),
-                        child: Text(
-                          'Division: ${userProvider.divisionsName}',
-                          style: const TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                  ],
-                ),
-              ),
-              // Image on the right side
-              const SizedBox(width: 10),
-              ClipRRect(
-                borderRadius: BorderRadius.circular(10),
-                child: Image.asset(
-                  'assets/images/crate_image.png', // Add your image to assets
-                  width: 60,
-                  height: 60,
-                  fit: BoxFit.cover,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
   Widget _buildStartScanButton() {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        // Camera Logo with Orange Color
         Icon(
           Icons.camera_alt,
-          size: 100,
-          color: const Color.fromARGB(255, 249, 139, 71), // Orange color
+          size: 60,
+          color: Color.fromARGB(255, 249, 139, 71),
         ),
-        const SizedBox(height: 20),
-        // Title
-        const Text(
+        SizedBox(height: 10),
+        Text(
           "Scan the QR Code",
           style: TextStyle(
-            fontSize: 24,
+            fontSize: 18,
             fontWeight: FontWeight.bold,
             color: Colors.black,
           ),
         ),
-        const SizedBox(height: 10),
-        // Subtitle
-        const Text(
+        SizedBox(height: 5),
+        Text(
           "Please scan the crate details",
-          style: TextStyle(fontSize: 16, color: Colors.grey),
+          style: TextStyle(fontSize: 12, color: Colors.grey),
         ),
-        const SizedBox(height: 30),
-        // Start Scan Button
+        SizedBox(height: 20),
         ElevatedButton(
           onPressed: selectedLorry != null ? _startScan : null,
           style: ElevatedButton.styleFrom(
             backgroundColor:
                 selectedLorry != null
-                    ? const Color.fromARGB(255, 249, 139, 71) // Orange color
+                    ? Color.fromARGB(255, 249, 139, 71)
                     : Colors.grey,
-            foregroundColor: Colors.white, // Ensures text color is white
-            padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
-            textStyle: const TextStyle(fontSize: 18),
+            foregroundColor: Colors.white,
+            padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
+            textStyle: const TextStyle(fontSize: 14),
           ),
           child: const Text("Start Scan"),
         ),
@@ -454,12 +419,10 @@ class _ReceivingTabState extends State<ReceivingTab> {
     return Container(
       decoration: BoxDecoration(
         image: DecorationImage(
-          image: const AssetImage(
-            'assets/images/background_pattern.jpg',
-          ), // Add your image to assets
+          image: const AssetImage('assets/images/background_pattern.jpg'),
           fit: BoxFit.cover,
           colorFilter: ColorFilter.mode(
-            Colors.white.withOpacity(0.9), // Fade effect
+            Colors.white.withOpacity(0.9),
             BlendMode.lighten,
           ),
         ),
@@ -497,7 +460,7 @@ class _ReceivingTabState extends State<ReceivingTab> {
                 padding: const EdgeInsets.all(8.0),
                 child: Text(
                   "Scanned Crates: ${scannedCrates.length}",
-                  style: const TextStyle(fontSize: 16),
+                  style: const TextStyle(fontSize: 14),
                 ),
               ),
               if (serverResponse.isNotEmpty)
@@ -506,7 +469,7 @@ class _ReceivingTabState extends State<ReceivingTab> {
                   child: Text(
                     serverResponse,
                     style: TextStyle(
-                      fontSize: 16,
+                      fontSize: 14,
                       fontWeight: FontWeight.bold,
                       color:
                           serverResponse.contains("successfully")
@@ -519,8 +482,12 @@ class _ReceivingTabState extends State<ReceivingTab> {
                 child: ListView.builder(
                   itemCount: scannedCrates.length,
                   itemBuilder:
-                      (context, index) =>
-                          ListTile(title: Text(scannedCrates[index])),
+                      (context, index) => ListTile(
+                        title: Text(
+                          scannedCrates[index],
+                          style: const TextStyle(fontSize: 12),
+                        ),
+                      ),
                 ),
               ),
               Padding(
@@ -531,32 +498,30 @@ class _ReceivingTabState extends State<ReceivingTab> {
                     ElevatedButton(
                       onPressed: _doneScanning,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color.fromARGB(
-                          255,
-                          5,
-                          168,
-                          29,
-                        ), // Orange color
-                        foregroundColor: Colors.white, // White text
+                        backgroundColor: Color.fromARGB(255, 5, 168, 29),
+                        foregroundColor: Colors.white,
                         padding: const EdgeInsets.symmetric(
-                          horizontal: 30,
-                          vertical: 15,
+                          horizontal: 20,
+                          vertical: 10,
                         ),
                       ),
-                      child: const Text("Done Scanning"),
+                      child: const Text(
+                        "Done Scanning",
+                        style: TextStyle(fontSize: 12),
+                      ),
                     ),
-                    const SizedBox(width: 20), // Space between buttons
+                    SizedBox(width: 10),
                     ElevatedButton(
                       onPressed: _resetPage,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.red, // Red color for exit
-                        foregroundColor: Colors.white, // White text
+                        backgroundColor: Colors.red,
+                        foregroundColor: Colors.white,
                         padding: const EdgeInsets.symmetric(
-                          horizontal: 30,
-                          vertical: 15,
+                          horizontal: 20,
+                          vertical: 10,
                         ),
                       ),
-                      child: const Text("Exit"),
+                      child: const Text("Exit", style: TextStyle(fontSize: 12)),
                     ),
                   ],
                 ),
@@ -565,6 +530,53 @@ class _ReceivingTabState extends State<ReceivingTab> {
           ),
         ),
       ],
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final userProvider = Provider.of<UserProvider>(context);
+
+    return Scaffold(
+      body: Stack(
+        children: [
+          _buildBackgroundImage(),
+          Column(
+            children: [
+              if (!isScanning)
+                SizedBox(
+                  height: 120,
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: [
+                        _buildLocationDetailsCard(userProvider),
+                        if (totalScannedCrates > 0)
+                          _buildTotalScannedCratesCard(),
+                        if (selectedLorry != null) _buildSelectedTruckCard(),
+                      ],
+                    ),
+                  ),
+                ),
+              Expanded(
+                child: Center(
+                  child:
+                      isScanning
+                          ? _buildScanner()
+                          : Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              _buildLorrySelection(userProvider),
+                              SizedBox(height: 20),
+                              _buildStartScanButton(),
+                            ],
+                          ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 }
