@@ -63,6 +63,7 @@ class _LoadingTabState extends State<LoadingTab> {
         isScanning = true;
         scannedCrates.clear();
         serverResponse = "";
+        totalScannedCrates = 0;
       });
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -76,9 +77,7 @@ class _LoadingTabState extends State<LoadingTab> {
   Future<void> _sendTotalCratesToDatabase() async {
     if (selectedLorry == null || totalScannedCrates == 0) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Please select a truck and scan crates first"),
-        ),
+        const SnackBar(content: Text("Please scan correct crates ")),
       );
       return;
     }
@@ -114,27 +113,138 @@ class _LoadingTabState extends State<LoadingTab> {
     }
   }
 
+  // New method to remove crate from database
+  Future<bool> _removeCrateFromDatabase(String serialNumber) async {
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+
+    try {
+      final response = await http.post(
+        Uri.parse(
+          'https://demo.secretary.lk/cargills_app/loading_person/backend/remove_loading_crate.php', // You'll need to create this endpoint
+        ),
+        body: {
+          'serial': serialNumber,
+          'vehicle_no': selectedLorry!,
+          'user_name': userProvider.username,
+          'mobile_number': userProvider.mobileNumber,
+        },
+      );
+
+      final responseData = json.decode(response.body);
+
+      if (response.statusCode == 200 && responseData["status"] == "success") {
+        setState(() {
+          serverResponse = "Crate $serialNumber removed successfully!";
+        });
+        return true;
+      } else {
+        setState(() {
+          serverResponse = "Failed to remove crate: ${responseData["message"]}";
+        });
+        return false;
+      }
+    } catch (e) {
+      setState(() {
+        serverResponse = "Error removing crate: ${e.toString()}";
+      });
+      return false;
+    }
+  }
+
+  // Method to handle crate removal with confirmation
+  Future<void> _removeCrate(String serialNumber) async {
+    // Show confirmation dialog
+    bool? shouldRemove = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Remove Crate'),
+          content: Text(
+            'Are you sure you want to remove crate: $serialNumber?',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              style: TextButton.styleFrom(foregroundColor: Colors.red),
+              child: const Text('Remove'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (shouldRemove == true) {
+      // Show loading indicator
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return const Center(child: CircularProgressIndicator());
+        },
+      );
+
+      // Try to remove from database first
+      bool removed = await _removeCrateFromDatabase(serialNumber);
+
+      // Close loading dialog
+      Navigator.of(context).pop();
+
+      if (removed) {
+        // Remove from local list and update count
+        setState(() {
+          scannedCrates.remove(serialNumber);
+          totalScannedCrates = scannedCrates.length;
+        });
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("Crate $serialNumber removed successfully"),
+            backgroundColor: Colors.green,
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("Failed to remove crate $serialNumber"),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
   void _doneScanning() {
     setState(() {
       isScanning = false;
-      totalScannedCrates = scannedCrates.length;
-      scannedCrates.clear();
     });
 
     _sendTotalCratesToDatabase();
 
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text("Total crates scanned: $totalScannedCrates")),
+      SnackBar(
+        content: Text("Total crates scanned and saved: $totalScannedCrates"),
+      ),
     );
   }
 
   Future<void> _sendToDatabase(String serialNumber) async {
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+
     try {
       final response = await http.post(
         Uri.parse(
           'https://demo.secretary.lk/cargills_app/loading_person/backend/loading_crate_log.php',
         ),
-        body: {'serial': serialNumber, 'vehicle_no': selectedLorry!},
+        body: {
+          'serial': serialNumber,
+          'vehicle_no': selectedLorry!,
+          'user_name': userProvider.username,
+          'mobile_number': userProvider.mobileNumber,
+        },
       );
 
       final responseData = json.decode(response.body);
@@ -143,6 +253,7 @@ class _LoadingTabState extends State<LoadingTab> {
         if (response.statusCode == 200) {
           if (responseData["status"] == "success") {
             serverResponse = "Crate $serialNumber saved successfully!";
+            totalScannedCrates++;
           } else if (responseData["status"] == "duplicate") {
             serverResponse = "You have already scanned this crate.";
           } else {
@@ -174,8 +285,8 @@ class _LoadingTabState extends State<LoadingTab> {
       elevation: 5,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
       child: Container(
-        width: 200, // Fixed width
-        padding: const EdgeInsets.all(12), // Reduced padding
+        width: 200,
+        padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [
@@ -193,7 +304,7 @@ class _LoadingTabState extends State<LoadingTab> {
             const Text(
               'Total Scanned Crates',
               style: TextStyle(
-                fontSize: 14, // Reduced font size
+                fontSize: 14,
                 fontWeight: FontWeight.bold,
                 color: Colors.white,
               ),
@@ -202,7 +313,7 @@ class _LoadingTabState extends State<LoadingTab> {
             Text(
               totalScannedCrates.toString(),
               style: const TextStyle(
-                fontSize: 18, // Reduced font size
+                fontSize: 18,
                 fontWeight: FontWeight.bold,
                 color: Colors.white,
               ),
@@ -287,8 +398,8 @@ class _LoadingTabState extends State<LoadingTab> {
       elevation: 5,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
       child: Container(
-        width: 200, // Fixed width
-        padding: const EdgeInsets.all(12), // Reduced padding
+        width: 200,
+        padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [
@@ -312,11 +423,11 @@ class _LoadingTabState extends State<LoadingTab> {
                       child: Text(
                         'Sub Location: ${userProvider.subLocationName}',
                         style: const TextStyle(
-                          fontSize: 12, // Reduced font size
+                          fontSize: 12,
                           fontWeight: FontWeight.bold,
                           color: Colors.white,
                         ),
-                        overflow: TextOverflow.ellipsis, // Handle overflow
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
                   if (userProvider.divisionsName.isNotEmpty)
@@ -326,11 +437,11 @@ class _LoadingTabState extends State<LoadingTab> {
                         child: Text(
                           'Division: ${userProvider.divisionsName}',
                           style: const TextStyle(
-                            fontSize: 12, // Reduced font size
+                            fontSize: 12,
                             fontWeight: FontWeight.bold,
                             color: Colors.white,
                           ),
-                          overflow: TextOverflow.ellipsis, // Handle overflow
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
                     ),
@@ -350,14 +461,14 @@ class _LoadingTabState extends State<LoadingTab> {
       children: [
         Icon(
           Icons.camera_alt,
-          size: 60, // Reduced size
+          size: 60,
           color: const Color.fromARGB(255, 249, 139, 71),
         ),
         const SizedBox(height: 10),
         const Text(
           "Scan the QR Code",
           style: TextStyle(
-            fontSize: 18, // Reduced font size
+            fontSize: 18,
             fontWeight: FontWeight.bold,
             color: Colors.black,
           ),
@@ -365,10 +476,7 @@ class _LoadingTabState extends State<LoadingTab> {
         const SizedBox(height: 5),
         const Text(
           "Please scan the crate details",
-          style: TextStyle(
-            fontSize: 12,
-            color: Colors.grey,
-          ), // Reduced font size
+          style: TextStyle(fontSize: 12, color: Colors.grey),
         ),
         const SizedBox(height: 20),
         ElevatedButton(
@@ -379,11 +487,8 @@ class _LoadingTabState extends State<LoadingTab> {
                     ? const Color.fromARGB(255, 249, 139, 71)
                     : Colors.grey,
             foregroundColor: Colors.white,
-            padding: const EdgeInsets.symmetric(
-              horizontal: 30,
-              vertical: 10,
-            ), // Reduced padding
-            textStyle: const TextStyle(fontSize: 14), // Reduced font size
+            padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
+            textStyle: const TextStyle(fontSize: 14),
           ),
           child: const Text("Start Scan"),
         ),
@@ -411,8 +516,8 @@ class _LoadingTabState extends State<LoadingTab> {
       elevation: 5,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
       child: Container(
-        width: 200, // Fixed width
-        padding: const EdgeInsets.all(12), // Reduced padding
+        width: 200,
+        padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [
@@ -426,19 +531,18 @@ class _LoadingTabState extends State<LoadingTab> {
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment:
-              MainAxisAlignment.center, // Center content vertically
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             if (selectedLorry != null)
               Flexible(
                 child: Text(
                   'Truck: $selectedLorry',
                   style: const TextStyle(
-                    fontSize: 12, // Reduced font size
+                    fontSize: 12,
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
                   ),
-                  overflow: TextOverflow.ellipsis, // Handle overflow
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
           ],
@@ -477,7 +581,7 @@ class _LoadingTabState extends State<LoadingTab> {
                 padding: const EdgeInsets.all(8.0),
                 child: Text(
                   "Scanned Crates: ${scannedCrates.length}",
-                  style: const TextStyle(fontSize: 14), // Reduced font size
+                  style: const TextStyle(fontSize: 14),
                 ),
               ),
               if (serverResponse.isNotEmpty)
@@ -486,7 +590,7 @@ class _LoadingTabState extends State<LoadingTab> {
                   child: Text(
                     serverResponse,
                     style: TextStyle(
-                      fontSize: 14, // Reduced font size
+                      fontSize: 14,
                       fontWeight: FontWeight.bold,
                       color:
                           serverResponse.contains("successfully")
@@ -502,9 +606,16 @@ class _LoadingTabState extends State<LoadingTab> {
                       (context, index) => ListTile(
                         title: Text(
                           scannedCrates[index],
-                          style: const TextStyle(
-                            fontSize: 12,
-                          ), // Reduced font size
+                          style: const TextStyle(fontSize: 12),
+                        ),
+                        trailing: IconButton(
+                          icon: const Icon(
+                            Icons.delete,
+                            color: Colors.red,
+                            size: 20,
+                          ),
+                          onPressed: () => _removeCrate(scannedCrates[index]),
+                          tooltip: 'Remove crate',
                         ),
                       ),
                 ),
@@ -520,13 +631,13 @@ class _LoadingTabState extends State<LoadingTab> {
                         backgroundColor: const Color.fromARGB(255, 5, 168, 29),
                         foregroundColor: Colors.white,
                         padding: const EdgeInsets.symmetric(
-                          horizontal: 20, // Reduced padding
-                          vertical: 10, // Reduced padding
+                          horizontal: 20,
+                          vertical: 10,
                         ),
                       ),
                       child: const Text(
                         "Done Scanning",
-                        style: TextStyle(fontSize: 12), // Reduced font size
+                        style: TextStyle(fontSize: 12),
                       ),
                     ),
                     const SizedBox(width: 10),
@@ -536,14 +647,11 @@ class _LoadingTabState extends State<LoadingTab> {
                         backgroundColor: Colors.red,
                         foregroundColor: Colors.white,
                         padding: const EdgeInsets.symmetric(
-                          horizontal: 20, // Reduced padding
-                          vertical: 10, // Reduced padding
+                          horizontal: 20,
+                          vertical: 10,
                         ),
                       ),
-                      child: const Text(
-                        "Exit",
-                        style: TextStyle(fontSize: 12), // Reduced font size
-                      ),
+                      child: const Text("Exit", style: TextStyle(fontSize: 12)),
                     ),
                   ],
                 ),
@@ -565,10 +673,9 @@ class _LoadingTabState extends State<LoadingTab> {
           _buildBackgroundImage(),
           Column(
             children: [
-              // Display cards only when not scanning
               if (!isScanning)
                 SizedBox(
-                  height: 120, // Fixed height for the cards
+                  height: 120,
                   child: SingleChildScrollView(
                     scrollDirection: Axis.horizontal,
                     child: Row(

@@ -140,21 +140,7 @@ class _MobileScreenState extends State<MobileScreen>
                   ),
                   child: Column(
                     children: [
-                      // Back Button
-                      FadeInDown(
-                        duration: const Duration(milliseconds: 800),
-                        child: Align(
-                          alignment: Alignment.topLeft,
-                          child: GestureDetector(
-                            onTap: () => Navigator.pop(context),
-                            child: const Icon(
-                              Icons.arrow_back,
-                              size: 32,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
-                      ),
+                      // Removed the back button section
                       const SizedBox(height: 18),
 
                       // Image

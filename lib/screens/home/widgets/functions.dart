@@ -629,11 +629,11 @@ class _SpecialOfferBannerState extends State<SpecialOfferBanner>
                             ),
                           ),
                           const SizedBox(width: 10),
-                          Expanded(
-                            child: _buildButton(
-                              'System crate Count: ${widget.systemCratesCount}',
-                            ),
-                          ),
+                          // Expanded(
+                          //   child: _buildButton(
+                          //     'System crate Count: ${widget.systemCratesCount}',
+                          //   ),
+                          // ),
                         ],
                       ),
                 ],

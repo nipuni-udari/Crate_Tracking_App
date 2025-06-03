@@ -63,6 +63,8 @@ class _ReceivingTabState extends State<ReceivingTab> {
         isScanning = true;
         scannedCrates.clear();
         serverResponse = "";
+        totalScannedCrates =
+            0; // Reset the totalScannedCrates to 0 for a new scan
       });
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -76,9 +78,7 @@ class _ReceivingTabState extends State<ReceivingTab> {
   Future<void> _sendTotalCratesToDatabase() async {
     if (selectedLorry == null || totalScannedCrates == 0) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Please select a lorry and scan crates first"),
-        ),
+        const SnackBar(content: Text("Please scan the correct crates")),
       );
       return;
     }
@@ -117,14 +117,15 @@ class _ReceivingTabState extends State<ReceivingTab> {
   void _doneScanning() {
     setState(() {
       isScanning = false;
-      totalScannedCrates = scannedCrates.length;
       scannedCrates.clear();
     });
 
     _sendTotalCratesToDatabase();
 
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text("Total crates scanned: $totalScannedCrates")),
+      SnackBar(
+        content: Text("Total crates scanned and saved: $totalScannedCrates"),
+      ),
     );
   }
 
@@ -143,6 +144,8 @@ class _ReceivingTabState extends State<ReceivingTab> {
         if (response.statusCode == 200) {
           if (responseData["status"] == "success") {
             serverResponse = "Crate $serialNumber saved successfully!";
+            // Increment totalScannedCrates only if the crate is successfully saved
+            totalScannedCrates++;
           } else if (responseData["status"] == "duplicate") {
             serverResponse = "You have already scanned this crate.";
           } else {
@@ -165,7 +168,7 @@ class _ReceivingTabState extends State<ReceivingTab> {
       scannedCrates.clear();
       selectedLorry = null;
       serverResponse = "";
-      totalScannedCrates = 0;
+      totalScannedCrates = 0; // Reset the count
     });
   }
 
