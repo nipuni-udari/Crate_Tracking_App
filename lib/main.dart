@@ -1,3 +1,4 @@
+import 'package:crate_tracking/screens/crates/summary_screen.dart';
 import 'package:crate_tracking/screens/mobile_checking.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -27,7 +28,9 @@ class MyApp extends StatelessWidget {
       routes: {
         '/': (context) => SplashScreen(),
         '/mobile': (context) => MobileScreen(),
+
         '/home': (context) => HomeScreen(mobileNumber: ''),
+        '/summary': (context) => SummaryScreen(),
         '/otp': (context) => OtpScreen(mobileNumber: '', otp: ''),
       },
     );

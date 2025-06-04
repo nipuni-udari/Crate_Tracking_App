@@ -1,3 +1,4 @@
+import 'package:crate_tracking/screens/crates/summary_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:crate_tracking/user_provider.dart';
@@ -25,8 +26,12 @@ class BottomNavBar extends StatelessWidget {
         screen = CrateScreen();
         break;
       case 2:
+        screen = SummaryScreen();
+        break;
+      case 3:
         screen = ProfileScreen(mobileNumber: mobileNumber);
         break;
+
       default:
         return;
     }
@@ -66,7 +71,11 @@ class BottomNavBar extends StatelessWidget {
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.shopping_cart, size: 30),
-          label: 'Crate Track',
+          label: 'Crate Scan',
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.bar_chart, size: 30),
+          label: 'Loading summary',
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.person, size: 30),
