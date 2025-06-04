@@ -105,7 +105,7 @@ class _SummaryScreenState extends State<SummaryScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Summary'),
-        backgroundColor: Color.fromARGB(255, 249, 139, 71),
+        backgroundColor: const Color.fromARGB(255, 249, 120, 45),
         foregroundColor: Colors.white,
         elevation: 0,
         automaticallyImplyLeading: false, // This line removes the back button
@@ -128,7 +128,7 @@ class _SummaryScreenState extends State<SummaryScreen> {
             width: double.infinity,
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Color.fromARGB(255, 249, 139, 71),
+              color: const Color.fromARGB(255, 249, 120, 45),
               borderRadius: const BorderRadius.only(
                 bottomLeft: Radius.circular(20),
                 bottomRight: Radius.circular(20),

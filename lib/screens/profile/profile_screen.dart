@@ -20,7 +20,7 @@ class ProfileScreen extends StatelessWidget {
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              Color.fromARGB(255, 249, 139, 71),
+              const Color.fromARGB(255, 249, 120, 45),
               Color.fromARGB(255, 255, 230, 9),
             ],
           ),

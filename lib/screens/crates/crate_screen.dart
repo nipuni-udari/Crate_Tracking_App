@@ -37,7 +37,7 @@ class _CrateScreenState extends State<CrateScreen>
           "Crate Tracking",
           style: TextStyle(color: Colors.black), // Title in white
         ),
-        backgroundColor: const Color.fromARGB(255, 249, 139, 71),
+        backgroundColor: const Color.fromARGB(255, 249, 120, 45),
         bottom: TabBar(
           controller: _tabController,
           labelColor: Colors.black, // Active tab text color

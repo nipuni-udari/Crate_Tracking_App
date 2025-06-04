@@ -616,9 +616,9 @@ class _SpecialOfferBannerState extends State<SpecialOfferBanner>
                             'Exact crate Count: ${widget.exactCratesCount}',
                           ),
                           const SizedBox(height: 10),
-                          _buildButton(
-                            'System crate Count: ${widget.systemCratesCount}',
-                          ),
+                          // _buildButton(
+                          //   'System crate Count: ${widget.systemCratesCount}',
+                          // ),
                         ],
                       )
                       : Row(

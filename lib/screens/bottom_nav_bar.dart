@@ -59,7 +59,7 @@ class BottomNavBar extends StatelessWidget {
     return BottomNavigationBar(
       currentIndex: currentIndex,
       onTap: (index) => _onItemTapped(context, index),
-      backgroundColor: const Color.fromARGB(255, 249, 139, 71),
+      backgroundColor: const Color.fromARGB(255, 249, 120, 45), // Light blue
       selectedItemColor: Colors.white,
       unselectedItemColor: const Color.fromARGB(255, 112, 112, 112),
       type: BottomNavigationBarType.fixed,
