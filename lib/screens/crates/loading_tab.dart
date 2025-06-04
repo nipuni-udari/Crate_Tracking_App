@@ -254,19 +254,51 @@ class _LoadingTabState extends State<LoadingTab> {
           if (responseData["status"] == "success") {
             serverResponse = "Crate $serialNumber saved successfully!";
             totalScannedCrates++;
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text("Crate $serialNumber saved successfully!"),
+                backgroundColor: Colors.green,
+              ),
+            );
           } else if (responseData["status"] == "duplicate") {
             serverResponse = "You have already scanned this crate.";
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text("Duplicate crate: $serialNumber"),
+                backgroundColor: Colors.orange,
+              ),
+            );
           } else {
             serverResponse = "Failed to save crate: ${responseData["message"]}";
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(
+                  "Failed to save crate: ${responseData["message"]}",
+                ),
+                backgroundColor: Colors.red,
+              ),
+            );
           }
         } else {
           serverResponse = "Server error: ${response.statusCode}";
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text("Server error: ${response.statusCode}"),
+              backgroundColor: Colors.red,
+            ),
+          );
         }
       });
     } catch (e) {
       setState(() {
         serverResponse = "Error: ${e.toString()}";
       });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Error: ${e.toString()}"),
+          backgroundColor: Colors.red,
+        ),
+      );
     }
   }
 
@@ -567,6 +599,14 @@ class _LoadingTabState extends State<LoadingTab> {
                       scannedCrates.add(serialNumber);
                     });
                     await _sendToDatabase(serialNumber);
+                  } else {
+                    // Show duplicate message immediately without database call
+                    // ScaffoldMessenger.of(context).showSnackBar(
+                    //   SnackBar(
+                    //     content: Text("Duplicate crate: $serialNumber"),
+                    //     backgroundColor: Colors.orange,
+                    //   ),
+                    // );
                   }
                 }
               }

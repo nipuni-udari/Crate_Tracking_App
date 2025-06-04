@@ -114,13 +114,17 @@ class _ReceivingTabState extends State<ReceivingTab> {
     }
   }
 
+  // Update the _doneScanning method
   void _doneScanning() {
     setState(() {
       isScanning = false;
-      scannedCrates.clear();
     });
 
-    _sendTotalCratesToDatabase();
+    _sendTotalCratesToDatabase().then((_) {
+      setState(() {
+        scannedCrates.clear();
+      });
+    });
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -129,13 +133,116 @@ class _ReceivingTabState extends State<ReceivingTab> {
     );
   }
 
+  // Add this method to _ReceivingTabState
+  Future<bool> _removeCrateFromDatabase(String serialNumber) async {
+    try {
+      final response = await http.post(
+        Uri.parse(
+          'https://demo.secretary.lk/cargills_app/loading_person/backend/remove_receiving_crate.php', // You'll need to create this endpoint
+        ),
+        body: {'serial': serialNumber, 'vehicle_no': selectedLorry!},
+      );
+
+      final responseData = json.decode(response.body);
+
+      if (response.statusCode == 200 && responseData["status"] == "success") {
+        setState(() {
+          serverResponse = "Crate $serialNumber removed successfully!";
+        });
+        return true;
+      } else {
+        setState(() {
+          serverResponse = "Failed to remove crate: ${responseData["message"]}";
+        });
+        return false;
+      }
+    } catch (e) {
+      setState(() {
+        serverResponse = "Error removing crate: ${e.toString()}";
+      });
+      return false;
+    }
+  }
+
+  // Add this method to _ReceivingTabState
+  Future<void> _removeCrate(String serialNumber) async {
+    // Show confirmation dialog
+    bool? shouldRemove = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Remove Crate'),
+          content: Text(
+            'Are you sure you want to remove crate: $serialNumber?',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              style: TextButton.styleFrom(foregroundColor: Colors.red),
+              child: const Text('Remove'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (shouldRemove == true) {
+      // Show loading indicator
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return const Center(child: CircularProgressIndicator());
+        },
+      );
+
+      // Try to remove from database first
+      bool removed = await _removeCrateFromDatabase(serialNumber);
+
+      // Close loading dialog
+      Navigator.of(context).pop();
+
+      if (removed) {
+        // Remove from local list and update count
+        setState(() {
+          scannedCrates.remove(serialNumber);
+          totalScannedCrates = scannedCrates.length;
+        });
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("Crate $serialNumber removed successfully"),
+            backgroundColor: Colors.green,
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("Failed to remove crate $serialNumber"),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
   Future<void> _sendToDatabase(String serialNumber) async {
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
     try {
       final response = await http.post(
         Uri.parse(
           'https://demo.secretary.lk/cargills_app/loading_person/backend/receiving_crate_log.php',
         ),
-        body: {'serial': serialNumber, 'vehicle_no': selectedLorry!},
+        body: {
+          'serial': serialNumber,
+          'vehicle_no': selectedLorry!,
+          'user_name': userProvider.username,
+          'mobile_number': userProvider.mobileNumber,
+        },
       );
 
       final responseData = json.decode(response.body);
@@ -481,6 +588,7 @@ class _ReceivingTabState extends State<ReceivingTab> {
                     ),
                   ),
                 ),
+              // Replace the existing ListView.builder in _buildScanner with this:
               Expanded(
                 child: ListView.builder(
                   itemCount: scannedCrates.length,
@@ -489,6 +597,15 @@ class _ReceivingTabState extends State<ReceivingTab> {
                         title: Text(
                           scannedCrates[index],
                           style: const TextStyle(fontSize: 12),
+                        ),
+                        trailing: IconButton(
+                          icon: const Icon(
+                            Icons.delete,
+                            color: Colors.red,
+                            size: 20,
+                          ),
+                          onPressed: () => _removeCrate(scannedCrates[index]),
+                          tooltip: 'Remove crate',
                         ),
                       ),
                 ),
